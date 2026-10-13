@@ -266,7 +266,7 @@
   .radios label { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #0f1a3d; width: 82px; height: 22px; cursor: pointer; }
   .radios input, .checks input { position: absolute; opacity: 0; pointer-events: none; }
   .ring { width: 20px; height: 20px; border: 1.6px solid #263a6d; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; }
-  .ring::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); transform: scale(0); transition: transform .15s; }
+  .ring::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); transform: scale(0); transition: transform .2s ease; }
   .radios input:checked + .ring { border-color: var(--teal); }
   .radios input:checked + .ring::after { transform: scale(1); }
   .radios input:focus-visible + .ring, .checks input:focus-visible + .sq { outline: 2px solid var(--teal); outline-offset: 2px; }
@@ -276,7 +276,8 @@
     display: grid; grid-template-columns: 76px 1fr;
   }
   .summary { position: relative; }
-  .summary .icon svg { position: absolute; left: 13.5px; top: 16px; }
+  .summary .icon > svg { position: absolute; left: 13.5px; top: 16px; }
+  .summary .icon .pair { position: absolute; left: 0; top: 0; bottom: 0; width: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
   .summary .headline { font-size: 17px; line-height: 21px; margin-bottom: 1px; letter-spacing: -.045em; }
   .summary .sep { margin: 0 8px; }
   .summary .row { display: flex; align-items: center; gap: 10px; font-size: 12.55px; line-height: 19px; font-weight: 300; color: var(--muted); }
@@ -285,8 +286,9 @@
   .summary .row .sep { margin: 0 7px; }
 
   .checks label { display: flex; align-items: center; gap: 12px; font-size: 12.7px; font-weight: 300; color: var(--muted); height: 19px; margin-bottom: 7px; cursor: pointer; }
-  .sq { width: 19px; height: 19px; flex: none; border: 1.6px solid #4a5d93; border-radius: 2px; display: flex; align-items: center; justify-content: center; }
-  .sq svg { opacity: 0; }
+  .sq { width: 19px; height: 19px; flex: none; border: 1.6px solid #4a5d93; border-radius: 2px; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease, border-color .2s ease; }
+  .sq svg { opacity: 0; transform: scale(.5); transition: opacity .2s ease, transform .2s ease; }
+  .checks input:checked + .sq svg { transform: scale(1); }
   .checks input:checked + .sq { background: var(--teal); border-color: var(--teal); }
   .checks input:checked + .sq svg { opacity: 1; }
   .checks a { color: var(--teal); text-underline-offset: 2px; }
@@ -298,8 +300,8 @@
   /* ---------- Colours sampled from the mockups ---------- */
   .serif { color: #000215; }
   .page-title { color: #000; }
-  .card .desc { color: #606a8a; }
-  .step-label { color: #505b7a; }
+  .card .desc { color: #4d5674; }
+  .step-label { color: #3f4a68; }
   .dot-radio { border-color: #5a6584; }
   .tick { border-color: #056f8e; }
   .card.on .tick { background: #056f8e; }
@@ -308,19 +310,47 @@
   .btn.s2 { background: #0a7192; }
   .day { color: #161527; }
   .day.on .num, .slot.on { background: #087596; border-color: #087596; }
-  .dow { color: #424f76; }
+  .dow { color: #36416a; }
   .slot { color: #000214; }
-  ::placeholder { color: #7d8cb2; }
+  ::placeholder { color: #5f6d94; }
   .label { color: #020938; }
-  .hint { color: #6c7aa6; }
+  .hint { color: #55628c; }
   .radios label { color: #0a0f3d; }
-  .box textarea::placeholder { color: #7b8ab1; }
-  .summary .row { color: #64739f; }
+  .box textarea::placeholder { color: #5f6d94; }
+  .summary .row { color: #4f5c86; }
   .summary .headline { color: #010b3c; }
-  .checks label { color: #5b6b99; }
-  .call { color: #596a98; }
+  .checks label { color: #485783; }
+  .call { color: #485783; }
   .done h1 { color: #001142; }
   .done p { color: #1c234f; }
+
+  /* ---------- Selection animations (200ms) ----------
+     Screens re-render on each tap, so the element that just changed gets anim-in / anim-out. */
+  .anim-in .tick { animation: tick-in .2s ease; }
+  .anim-in .tick svg { animation: pop-in .2s ease; }
+  .anim-out .tick { animation: tick-out .2s ease; }
+  .anim-in .dot-radio::after { animation: dot-in .2s ease; }
+  .anim-out .dot-radio::after { animation: dot-out .2s ease; }
+  .day.anim-in .num { animation: day-in .2s ease; }
+  .day.anim-out .num { animation: day-out .2s ease; }
+  .slot.anim-in { animation: slot-in .2s ease; }
+  .slot.anim-out { animation: slot-out .2s ease; }
+  .btn.enabling { animation: btn-on .2s ease; }
+  .btn.disabling { animation: btn-off .2s ease; }
+  @keyframes tick-in { from { background-color: #fff; } }
+  @keyframes tick-out { from { background-color: #056f8e; } }
+  @keyframes pop-in { from { transform: scale(.4); opacity: 0; } }
+  @keyframes dot-in { from { transform: scale(0); } }
+  @keyframes dot-out { from { transform: scale(1); } to { transform: scale(0); } }
+  @keyframes day-in { from { background-color: transparent; color: #161527; transform: scale(.6); } }
+  @keyframes day-out { from { background-color: #087596; color: #fff; } }
+  @keyframes slot-in { from { background-color: #fff; border-color: #b3dcea; color: #000214; } }
+  @keyframes slot-out { from { background-color: #087596; border-color: #087596; color: #fff; } }
+  @keyframes btn-on { from { opacity: .4; } }
+  @keyframes btn-off { from { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }
 
   /* ---------- Step 4 ---------- */
   .s4 .step-label { margin-top: 5px; }
@@ -421,7 +451,10 @@
   };
   const fmtDuration = m => m > 60 ? `${m / 60} hours` : `${m} minutes`;
   const fmtLongDate = (d, year = false) => `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}${year ? ", " + d.getFullYear() : ""}`;
-  const intentLabel = () => state.buy && state.sell ? "Buy &amp; Sell" : state.buy ? "Buy" : "Sell";
+  const intentLabel = () => state.buy && state.sell ? "Buy &amp; Sell" : state.buy ? "Buy Bullion" : "Sell Bullion";
+  const summaryIcon = () => state.buy && state.sell
+    ? `<span class="pair">${vec("cartT", "#000", .7)}${vec("box", "#000", .58)}</span>`
+    : state.buy ? vec("cartT", "#000", .9) : vec("box", "#000", .75);
   const digits = s => s.replace(/\D/g, "");
   const fmtPhone = (s, cc) => {
     const d = digits(s).slice(0, cc === "+1" ? 10 : 14);
@@ -543,7 +576,7 @@
       <main class="view s3">
         ${progress(3)}
         ${backBtn("arrow2")}
-        <h1 class="serif title">Please provide details</h1>
+        <h1 class="serif title">Please enter some details</h1>
         <form id="details" novalidate>
           <div class="field ${bad("name")}">
             <div class="box"><span class="lead">${vec("user")}</span><input name="name" autocomplete="name" placeholder="Enter your name" aria-label="Name" value="${esc(f.name)}"></div>
@@ -580,9 +613,9 @@
         </form>
 
         <div class="summary">
-          <div class="icon">${state.buy ? vec("cartT", null, .9) : vec("box", TRACED.cartT[2], .75)}</div>
+          <div class="icon">${summaryIcon()}</div>
           <div>
-            <div class="serif headline">${intentLabel()} Bullion<span class="sep">•</span>${fmtDuration(state.duration)}</div>
+            <div class="serif headline">${intentLabel()}<span class="sep">•</span>${fmtDuration(state.duration)}</div>
             <div class="row">${vec("cal")}${fmtLongDate(state.date, true)}</div>
             <div class="row">${vec("clock")}<span>${fmtRange(state.time, state.duration)}<span class="sep">•</span>Montréal time</span></div>
             <div class="row">${vec("pin")}${ADDRESS}</div>
@@ -627,9 +660,21 @@
   }
 
   /* ---------- render & events ---------- */
+  const key = el => el.dataset.act + ":" + el.dataset.v;
   function render(newStep = true) {
+    // remember what was selected / enabled so the changes can be animated
+    const wasOn = new Set([...app.querySelectorAll("[data-v].on")].map(key));
+    const btnBefore = app.querySelector(".btn[data-act=next]")?.disabled;
     app.className = "app" + (state.step === 1 ? " has-topbar" : "") + (newStep ? "" : " still");
     app.innerHTML = [null, step1, step2, step3, step4][state.step]();
+    if (!newStep) {
+      app.querySelectorAll("[data-v]").forEach(el => {
+        const on = el.classList.contains("on"), was = wasOn.has(key(el));
+        if (on !== was) el.classList.add(on ? "anim-in" : "anim-out");
+      });
+      const btn = app.querySelector(".btn[data-act=next]");
+      if (btn && btnBefore !== undefined && btn.disabled !== btnBefore) btn.classList.add(btn.disabled ? "disabling" : "enabling");
+    }
     if (newStep) scroller.scrollTop = 0;
     fit();
   }
