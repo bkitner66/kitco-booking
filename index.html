@@ -161,6 +161,19 @@
     .lang button { width: 38px; height: 26px; font-size: 12px; border-radius: 5px; }
   }
 
+  /* transaction value and Kitco account question share a row */
+  /* label / control / error rows are shared (subgrid) so the box and the Yes/No line up even when a label wraps */
+  .field.pair-row { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; column-gap: 14px; }
+  .field.pair-row > .field { margin-top: 0; min-width: 0; display: grid; grid-row: span 3; grid-template-rows: subgrid; }
+  .pair-row .label { align-self: end; }
+  .pair-row .radios { margin-top: 0; height: 33px; align-items: center; }
+  .pair-row .radios label { width: auto; margin-right: 22px; }
+
+  /* Phones: steps 1 and 3 grow (via --k) to use the free space down to the button */
+  @media (max-width: 599px) {
+    html:not(.shot) main.s1 .cols, html:not(.shot) main.s3 .cols { display: flex; flex-direction: column; zoom: var(--k, 1); }
+  }
+
   /* layout wrappers only matter on larger screens */
   .cols, .col { display: contents; }
 
@@ -353,7 +366,7 @@
   .box .vsep { width: 1.2px; height: 21px; background: #b7bfd1; flex: none; }
   .box .vsep + input { padding-left: 13px; }
   .box.area { height: auto; align-items: stretch; }
-  .box textarea { width: 100%; height: 66px; padding: 7px 12px; font-size: 13.1px; line-height: 17px; resize: none; color: var(--text); }
+  .box textarea { width: 100%; height: 83px; padding: 7px 12px; font-size: 13.1px; line-height: 17px; resize: none; color: var(--text); }
   ::placeholder { color: #5b72aa; opacity: 1; }
   .box textarea::placeholder { color: #8b9bc4; font-weight: 300; }
   .err { font-size: 11.5px; color: var(--error); margin-top: 5px; display: none; }
@@ -383,7 +396,7 @@
   .summary .row .ic-pin { margin: 0 .7px; }
   .summary .row .sep { margin: 0 7px; }
 
-  .checks label { display: flex; align-items: center; gap: 12px; font-size: 12.7px; font-weight: 400; color: var(--muted); height: 19px; margin-bottom: 7px; cursor: pointer; }
+  .checks label { display: flex; align-items: center; gap: 12px; font-size: 12.7px; font-weight: 400; color: var(--muted); min-height: 19px; margin-bottom: 7px; cursor: pointer; }
   .sq { width: 19px; height: 19px; flex: none; border: 1.6px solid #4a5d93; border-radius: 2px; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease, border-color .2s ease; }
   .sq svg { opacity: 0; transform: scale(.5); transition: opacity .2s ease, transform .2s ease; }
   .checks input:checked + .sq svg { transform: scale(1); }
@@ -516,7 +529,7 @@
       prepare: "Help us prepare for your visit",
       namePh: "Enter your name", nameLbl: "Name", emailPh: "Enter email address", emailLbl: "Email address",
       phone: "Phone number", ccLbl: "Country code",
-      value: "Estimated transaction value (CAD)", valueLbl: "Estimated transaction value in Canadian dollars",
+      value: "Est. transaction value (CAD)", valueLbl: "Estimated transaction value in Canadian dollars",
       account: "Do you have a Kitco account?", yes: "Yes", no: "No",
       notesLbl: "Please provide more details to help us prepare for your visit",
       notesPh: "List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).",
@@ -552,7 +565,7 @@
       prepare: "Aidez-nous à préparer votre visite",
       namePh: "Entrez votre nom", nameLbl: "Nom", emailPh: "Entrez votre adresse courriel", emailLbl: "Adresse courriel",
       phone: "Numéro de téléphone", ccLbl: "Indicatif de pays",
-      value: "Valeur estimée de la transaction ($ CA)", valueLbl: "Valeur estimée de la transaction en dollars canadiens",
+      value: "Valeur estimée ($ CA)", valueLbl: "Valeur estimée de la transaction en dollars canadiens",
       account: "Avez-vous un compte Kitco?", yes: "Oui", no: "Non",
       notesLbl: "Donnez-nous plus de détails pour nous aider à préparer votre visite",
       notesPh: "Indiquez les articles que vous souhaitez acheter ou vendre et leurs quantités, vos préférences de paiement ou de versement, ainsi que votre numéro de compte Kitco (le cas échéant).",
@@ -823,17 +836,19 @@
               <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="${f.cc === "+1" ? "(555) 123-4567" : t.phone}" value="${esc(f.phone)}">
             </div>
           </div>
+          <div class="field pair-row">
           <div class="field ${bad("value")}">
             <label class="label" for="value">${t.value}</label>
             <div class="box shorter"><input id="value" name="value" inputmode="numeric" aria-label="${t.valueLbl}" value="${esc(f.value)}"></div>
             <div class="err">${err.value || ""}</div>
           </div>
-          <div class="field gap ${bad("account")}">
+          <div class="field ${bad("account")}">
             <span class="label">${t.account}</span>
             <div class="radios" role="radiogroup" aria-label="${t.account}">
               ${[["Yes", t.yes], ["No", t.no]].map(([v, label]) => `<label><input type="radio" name="account" value="${v}" ${f.account === v ? "checked" : ""}><span class="ring"></span>${label}</label>`).join("")}
             </div>
             <div class="err">${err.account || ""}</div>
+          </div>
           </div>
           <div class="field gap">
             <label class="label" for="notes">${t.notesLbl}</label>
@@ -916,8 +931,27 @@
 
   // Every screen must fit without scrolling: if the content is taller than the screen,
   // scale the whole screen down just enough to fit.
+  // Phones: enlarge steps 1 and 3 until they reach just above the button (never past it).
+  function fill() {
+    const cols = app.querySelector("main.s1 .cols, main.s3 .cols");
+    if (!cols) return;
+    cols.style.setProperty("--k", 1);
+    if (document.documentElement.classList.contains("shot") || !matchMedia("(max-width: 599px)").matches) return;
+    const avail = scroller.clientHeight - 8;
+    const need = () => { app.classList.add("measure"); const h = app.scrollHeight; app.classList.remove("measure"); return h; };
+    if (need() >= avail) return;
+    let lo = 1, hi = 1.5;
+    for (let i = 0; i < 9; i++) {
+      const mid = (lo + hi) / 2;
+      cols.style.setProperty("--k", mid);
+      if (need() <= avail) lo = mid; else hi = mid;
+    }
+    cols.style.setProperty("--k", lo);
+  }
+
   function fit() {
     Object.assign(app.style, { transform: "", width: "", height: "", minHeight: "", marginRight: "", marginBottom: "" });
+    fill();
     app.classList.add("measure");
     const need = app.scrollHeight, avail = scroller.clientHeight, w = scroller.clientWidth;
     app.classList.remove("measure");
