@@ -237,7 +237,7 @@
     transition: border-color .15s, box-shadow .15s;
   }
   .box:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(21, 122, 149, .12); }
-  .box input, .box textarea, .box select { border: 0; outline: 0; background: transparent; min-width: 0; }
+  .box input, .box textarea { border: 0; outline: 0; background-color: transparent; min-width: 0; }
   .box input { width: 100%; height: 100%; padding: 0 13px; font-size: 13.1px; color: var(--text); }
   .box .lead { width: 46px; flex: none; display: flex; }
   .box .lead .ic-user { margin-left: 11px; }
@@ -245,12 +245,12 @@
   .box .lead + input { padding-left: 0; }
   .box.short { height: 34px; }
   .box.shorter { height: 33px; }
-  .box select {
-    appearance: none; -webkit-appearance: none; height: 100%; width: 68px; flex: none;
-    padding: 0 0 0 13px; font-size: 13.5px; color: #0f1a3d; cursor: pointer;
-    background: no-repeat 44.3px center;
-    border-radius: 0;
+  .box .cc {
+    height: 100%; width: 74px; flex: none; padding: 0 22px 0 13px; font-size: 13.5px; color: #0f1a3d;
+    background: no-repeat 52px center;
   }
+  /* keep the browser's suggestion trigger clickable but show our chevron instead */
+  .box .cc::-webkit-calendar-picker-indicator { opacity: 0; width: 18px; margin: 0 -18px 0 0; cursor: pointer; }
   .box .vsep { width: 1.2px; height: 21px; background: #b7bfd1; flex: none; }
   .box .vsep + input { padding-left: 13px; }
   .box.area { height: auto; align-items: stretch; }
@@ -317,10 +317,10 @@
   .hint { color: #55628c; }
   .radios label { color: #0a0f3d; }
   .box textarea::placeholder { color: #5f6d94; }
-  .summary .row { color: #4f5c86; }
+  .summary .row { color: #000; }
   .summary .headline { color: #010b3c; }
-  .checks label { color: #485783; }
-  .call { color: #485783; }
+  .checks label { color: #000; }
+  .call { color: #000; }
   .done h1 { color: #001142; }
   .done p { color: #1c234f; }
 
@@ -571,7 +571,17 @@
   function step3() {
     const f = state.form, err = validate();
     const bad = k => state.showErrors && err[k] ? "invalid" : "";
-    const codes = ["+1", "+44", "+33", "+49", "+39", "+34", "+61", "+86", "+852", "+91", "+971"];
+    // Suggestions only: any code can be typed.
+    const codes = [["+1", "Canada / United States"], ["+44", "United Kingdom"], ["+33", "France"], ["+49", "Germany"], ["+39", "Italy"],
+      ["+34", "Spain"], ["+351", "Portugal"], ["+31", "Netherlands"], ["+32", "Belgium"], ["+41", "Switzerland"], ["+43", "Austria"],
+      ["+353", "Ireland"], ["+45", "Denmark"], ["+46", "Sweden"], ["+47", "Norway"], ["+358", "Finland"], ["+48", "Poland"],
+      ["+30", "Greece"], ["+90", "Türkiye"], ["+972", "Israel"], ["+971", "United Arab Emirates"], ["+966", "Saudi Arabia"],
+      ["+20", "Egypt"], ["+27", "South Africa"], ["+234", "Nigeria"], ["+254", "Kenya"], ["+212", "Morocco"], ["+91", "India"],
+      ["+92", "Pakistan"], ["+86", "China"], ["+852", "Hong Kong"], ["+886", "Taiwan"], ["+81", "Japan"], ["+82", "South Korea"],
+      ["+65", "Singapore"], ["+60", "Malaysia"], ["+66", "Thailand"], ["+84", "Vietnam"], ["+63", "Philippines"], ["+62", "Indonesia"],
+      ["+61", "Australia"], ["+64", "New Zealand"], ["+52", "Mexico"], ["+55", "Brazil"], ["+54", "Argentina"], ["+56", "Chile"],
+      ["+57", "Colombia"], ["+51", "Peru"], ["+509", "Haiti"], ["+7", "Russia / Kazakhstan"], ["+380", "Ukraine"], ["+98", "Iran"],
+      ["+961", "Lebanon"], ["+213", "Algeria"], ["+216", "Tunisia"], ["+225", "Côte d’Ivoire"], ["+221", "Senegal"], ["+237", "Cameroon"]];
     return `
       <main class="view s3">
         ${progress(3)}
@@ -589,13 +599,13 @@
           <div class="field">
             <label class="label" for="phone">Phone number</label>
             <div class="box short">
-              <select name="cc" aria-label="Country code" style="background-image:url('${chevData}')">${codes.map(c => `<option ${c === f.cc ? "selected" : ""}>${c}</option>`).join("")}</select><span class="vsep"></span>
+              <input class="cc" name="cc" type="tel" inputmode="tel" autocomplete="tel-country-code" list="cc-list" aria-label="Country code" value="${esc(f.cc)}" style="background-image:url('${chevData}')"><datalist id="cc-list">${codes.map(([c, n]) => `<option value="${c}">${n}</option>`).join("")}</datalist><span class="vsep"></span>
               <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="${f.cc === "+1" ? "(555) 123-4567" : "Phone number"}" value="${esc(f.phone)}">
             </div>
           </div>
           <div class="field ${bad("value")}">
             <label class="label" for="value">Estimated transaction value (CAD)</label>
-            <div class="box shorter"><input id="value" name="value" inputmode="numeric" placeholder="e.g. 25,000" value="${esc(f.value)}"></div>
+            <div class="box shorter"><input id="value" name="value" inputmode="numeric" aria-label="Estimated transaction value in Canadian dollars" value="${esc(f.value)}"></div>
             <div class="hint">Temporary minimum: $5,000.</div>
             <div class="err">${err.value || ""}</div>
           </div>
@@ -754,6 +764,13 @@
     if (!t.name || !(t.name in f)) return;
     if (t.type === "checkbox") f[t.name] = t.checked;
     else if (t.type === "radio") f[t.name] = t.value;
+    else if (t.name === "cc") {
+      // "+" followed by up to 4 digits; reformat the number for the new code without re-rendering (keeps focus)
+      f.cc = t.value = "+" + digits(t.value).slice(0, 4);
+      const ph = app.querySelector("[name=phone]");
+      f.phone = ph.value = fmtPhone(f.phone, f.cc);
+      ph.placeholder = f.cc === "+1" ? "(555) 123-4567" : "Phone number";
+    }
     else if (t.name === "phone") { f.phone = fmtPhone(t.value, f.cc); t.value = f.phone; }
     else if (t.name === "value") { f.value = fmtMoney(t.value); t.value = f.value; }
     else f[t.name] = t.value;
@@ -764,13 +781,6 @@
         const inp = box.querySelector("input, textarea");
         if (inp && !(inp.name in err)) box.classList.remove("invalid");
       });
-    }
-  });
-  app.addEventListener("change", e => {
-    if (e.target.name === "cc") {
-      state.form.cc = e.target.value;
-      state.form.phone = fmtPhone(state.form.phone, state.form.cc);
-      render(false);
     }
   });
   app.addEventListener("submit", e => e.preventDefault());
