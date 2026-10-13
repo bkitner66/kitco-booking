@@ -153,8 +153,10 @@
     html:not(.shot) main.s1 .page-title { display: none; }
     html:not(.shot) main.s1 .step-label { margin-top: 10px; }
     /* step 1: tighter spacing so the text can grow into the freed space (see fill()) */
-    html:not(.shot) .hero { padding: 12px 16px 13px; }
-    html:not(.shot) .hero-sub { font-size: 13px; margin-top: 4px; }
+    html:not(.shot) .hero { padding: 10px 16px 11px; }
+    /* one shorter title that includes the address, no subtitle */
+    html:not(.shot) .hero-sub, html:not(.shot) .hero-title .for-desk { display: none; }
+    html:not(.shot) .hero-title { font-size: 20px; line-height: 1.18; }
     html:not(.shot) .s1 h2.section { margin: 12px 0 6px; }
     html:not(.shot) .s1 h2.section.second { margin: 8px 0 6px; }
     html:not(.shot) .s1 .card { margin-bottom: 6px; }
@@ -219,6 +221,9 @@
   .km-back { position: sticky; top: 0; background: #f4f4f7; margin: 0 -20px 8px; padding: 12px 20px; }
   .km-back button { background: none; border: 0; padding: 0; font: 700 16px Arial, Helvetica, sans-serif; color: #333; cursor: pointer; display: flex; align-items: center; gap: 8px; }
   .km-group { font-weight: 700; font-size: 16px; padding: 10px 0 2px; display: block; }
+
+  .hero-title .for-phone { display: none; }
+  @media (max-width: 599px) { html:not(.shot) .hero-title .for-phone { display: inline; } }
 
   /* layout wrappers only matter on larger screens */
   .cols, .col { display: contents; }
@@ -563,6 +568,7 @@
       docTitle: "Book an Appointment",
       heroTitle: "Book An Appointment At Our Montreal Counter",
       heroSub: "We look forward to your visit at 620 Cathcart St., 9th Floor.",
+      heroMobile: "Book an Appointment at 620&nbsp;Cathcart, 9th&nbsp;Floor, Montreal",
       language: "Language", menu: "Menu",
       hello: "Hello,", logIn: "Log In", or: "or", createAccount: "Create Account", closeMenu: "Close menu",
       bookTitle: "Book an Appointment", step: n => `Step ${n} of 4`,
@@ -600,6 +606,7 @@
       docTitle: "Prendre rendez-vous",
       heroTitle: "Prenez rendez-vous à notre comptoir de Montréal",
       heroSub: "Au plaisir de vous accueillir au 620, rue Cathcart, 9e étage.",
+      heroMobile: "Prendre rendez-vous au 620,&nbsp;rue&nbsp;Cathcart, 9e&nbsp;étage, Montréal",
       language: "Langue", menu: "Menu",
       hello: "Bonjour,", logIn: "Ouvrir une session", or: "ou", createAccount: "Créer un compte", closeMenu: "Fermer le menu",
       bookTitle: "Prendre rendez-vous", step: n => `Étape ${n} de 4`,
@@ -761,7 +768,7 @@
           <button data-act="lang" data-v="fr" class="${lang === "fr" ? "active" : ""}" aria-pressed="${lang === "fr"}" lang="fr">FR</button>
         </div>
         <div class="hero">
-          <h1 class="serif hero-title">${T().heroTitle}</h1>
+          <h1 class="serif hero-title"><span class="for-desk">${T().heroTitle}</span><span class="for-phone">${T().heroMobile}</span></h1>
           <p class="hero-sub">${T().heroSub}</p>
         </div>
       </header>
