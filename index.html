@@ -98,7 +98,8 @@
   .shot .screen { border-radius: 0; }
 
   /* Real phones: full screen, the OS draws its own status bar */
-  @media (max-width: 520px) {
+  /* ---------- Phones (up to 599px): full screen ---------- */
+  @media (max-width: 599px) {
     html:not(.shot) body { background: #fff; }
     html:not(.shot) .stage { padding: 0; display: block; }
     html:not(.shot) .device { width: 100%; height: 100dvh; padding: 0; border-radius: 0; background: #fff; box-shadow: none; }
@@ -108,6 +109,60 @@
     html:not(.shot) .app { padding-top: env(safe-area-inset-top); }
     html:not(.shot) .app.has-topbar { padding-top: 0; }
     html:not(.shot) .topbar { padding-top: env(safe-area-inset-top); height: calc(53px + env(safe-area-inset-top)); }
+    /* the Kitco bar only shows on step 1 on phones */
+    html:not(.shot) .app:not(.has-topbar) .topbar { display: none; }
+  }
+
+  /* layout wrappers only matter on larger screens */
+  .cols, .col { display: contents; }
+
+  /* ---------- Tablet & desktop (600px and up): a page with the Kitco bar and a centred card ---------- */
+  @media (min-width: 600px) {
+    html:not(.shot) body { background: #eef1f5; }
+    html:not(.shot) .stage { display: block; padding: 0; }
+    html:not(.shot) .device { width: auto; height: 100vh; height: 100dvh; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+    html:not(.shot) .screen { border-radius: 0; background: none; }
+    html:not(.shot) .island, html:not(.shot) .statusbar { display: none; }
+    html:not(.shot) .scroller { inset: 0; }
+    html:not(.shot) .app.has-topbar, html:not(.shot) .app { padding-top: 0; }
+    html:not(.shot) .topbar .bar { width: min(960px, 100% - 48px); margin: 0 auto; }
+    html:not(.shot) .topbar .menu { left: -4px; }
+    html:not(.shot) .topbar .mark { left: 39.4px; }
+    html:not(.shot) .topbar .word { left: 82.5px; }
+    html:not(.shot) .topbar .reg { left: 154.4px; }
+    html:not(.shot) main {
+      flex: none; width: min(560px, 100% - 48px); margin: 32px auto;
+      background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgba(20, 30, 60, .06), 0 12px 32px rgba(20, 30, 60, .08);
+      padding: 28px 32px 30px;
+    }
+    html:not(.shot) main.s1 .page-title { margin-top: 0; }
+    html:not(.shot) .grow { flex: none; height: 22px; min-height: 0; }
+    html:not(.shot) main.s3 .btn.s3 { margin-top: 6px; }
+    html:not(.shot) .card, html:not(.shot) .slot, html:not(.shot) .day:not(:disabled) { cursor: pointer; }
+    html:not(.shot) .card:hover { border-color: #9fcfe0; }
+    html:not(.shot) .slot:not(:disabled):not(.on):hover { border-color: #7fbfd6; }
+    html:not(.shot) main.s4 { width: min(480px, 100% - 48px); }
+    html:not(.shot) .slots { grid-template-columns: repeat(3, 1fr); column-gap: 8px; }
+    html:not(.shot) .done { padding: 24px 0 8px; }
+  }
+
+  /* ---------- Desktop (960px and up): two columns ---------- */
+  @media (min-width: 960px) {
+    html:not(.shot) main { width: min(960px, 100% - 48px); padding: 40px 48px 40px; }
+    html:not(.shot) .page-title { font-size: 36px; line-height: 42px; }
+    html:not(.shot) h1.title { font-size: 34px; line-height: 40px; }
+    html:not(.shot) h2.section { font-size: 24px; line-height: 28px; }
+    html:not(.shot) .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    html:not(.shot) .col { display: block; min-width: 0; }
+    html:not(.shot) .s1 .cols { margin-top: 24px; }
+    html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
+    html:not(.shot) .s2 .cols { margin-top: 20px; }
+    html:not(.shot) .s2 .col h2.section { margin-top: 0; }
+    html:not(.shot) .s3 .cols { margin-top: 6px; }
+    html:not(.shot) .s3 .summary { margin-top: 0; }
+    html:not(.shot) main.s3 .btn.s3 { margin-top: 10px; }
+    html:not(.shot) .btn.s1, html:not(.shot) .btn.s2 { width: 260px; align-self: flex-end; }
+    html:not(.shot) main.s4 { width: min(520px, 100% - 48px); }
   }
 
   .app { min-height: 100%; display: flex; flex-direction: column; }
@@ -497,6 +552,16 @@
     </div>`;
   const backBtn = name => `<button class="back" data-act="back">${vec(name, "currentColor")}Back</button>`;
 
+  const topbar = () => `
+      <header class="topbar">
+        <div class="bar">
+          <button class="menu" aria-label="Menu">${vec("menu", "#fff")}</button>
+          <span class="mark" role="img" aria-label="Kitco">${vec("mark")}</span>
+          <span class="word">${WORDMARK}</span>
+          <svg class="reg" width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><circle cx="3.5" cy="3.5" r="3.05" fill="none" stroke="#d3d7dc" stroke-width=".6"/><text x="3.55" y="5.05" text-anchor="middle" font-family="Lato, sans-serif" font-weight="700" font-size="4.3" fill="#d3d7dc">R</text></svg>
+        </div>
+      </header>`;
+
   /* ---------- screens ---------- */
   function step1() {
     const intents = [
@@ -509,17 +574,11 @@
       { m: 120, name: "2 hours", desc: "For business appointments that need extra time, or if we’ve asked you to book 2 hours." },
     ];
     return `
-      <header class="topbar">
-        <div class="bar">
-          <button class="menu" aria-label="Menu">${vec("menu", "#fff")}</button>
-          <span class="mark" role="img" aria-label="Kitco">${vec("mark")}</span>
-          <span class="word">${WORDMARK}</span>
-          <svg class="reg" width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><circle cx="3.5" cy="3.5" r="3.05" fill="none" stroke="#d3d7dc" stroke-width=".6"/><text x="3.55" y="5.05" text-anchor="middle" font-family="Lato, sans-serif" font-weight="700" font-size="4.3" fill="#d3d7dc">R</text></svg>
-        </div>
-      </header>
+      ${topbar()}
       <main class="view s1">
         <h1 class="serif page-title">Book an Appointment</h1>
         ${progress(1)}
+        <div class="cols"><div class="col">
         <h2 class="serif section">What would you like to do?</h2>
         ${intents.map(o => `
           <button class="card intent ${state[o.id] ? "on" : ""}" role="checkbox" aria-checked="${state[o.id]}" data-act="intent" data-v="${o.id}">
@@ -529,6 +588,7 @@
               <span class="desc">${o.desc}</span>
             </span>
           </button>`).join("")}
+        </div><div class="col">
         <h2 class="serif section second">How much time do you need?</h2>
         <div role="radiogroup" aria-label="Duration">
         ${durations.map(o => `
@@ -540,6 +600,7 @@
             </span>
           </button>`).join("")}
         </div>
+        </div></div>
         <div class="grow"></div>
         <button class="btn s1" data-act="next" ${(state.buy || state.sell) && state.duration ? "" : "disabled"}>Continue</button>
       </main>`;
@@ -556,10 +617,12 @@
       cells += `<button class="day ${sameDay(date, state.date) ? "on" : ""}" data-act="date" data-v="${date.getTime()}" ${open ? "" : "disabled"} aria-label="${fmtLongDate(date)}${open ? "" : " (unavailable)"}"><span class="num">${d}</span><span class="dot"></span></button>`;
     }
     return `
+      ${topbar()}
       <main class="view s2">
         ${progress(2)}
         ${backBtn("arrow2")}
         <h1 class="serif title">Choose a date &amp; time</h1>
+        <div class="cols"><div class="col">
         <div class="calendar">
           <div class="cal-head">
             <h3 class="serif">${MONTHS[mo]} ${y}</h3>
@@ -571,11 +634,13 @@
             ${cells}
           </div>
         </div>
+        </div><div class="col">
         ${state.date ? `
           <h2 class="serif section">${fmtLongDate(state.date)}</h2>
           <div class="slots">
             ${slotsFor(state.date).map(s => `<button class="slot ${state.time === s.m ? "on" : ""}" data-act="time" data-v="${s.m}" ${s.disabled ? "disabled" : ""}>${fmtTime(s.m)}</button>`).join("")}
           </div>` : ""}
+        </div></div>
         <div class="grow"></div>
         <button class="btn s2" data-act="next" ${state.date && state.time != null ? "" : "disabled"}>Continue</button>
       </main>`;
@@ -585,10 +650,12 @@
     const f = state.form, err = validate();
     const bad = k => state.showErrors && err[k] ? "invalid" : "";
     return `
+      ${topbar()}
       <main class="view s3">
         ${progress(3)}
         ${backBtn("arrow2")}
         <h1 class="serif title">Help us prepare for your visit</h1>
+        <div class="cols"><div class="col">
         <form id="details" novalidate>
           <div class="field ${bad("name")}">
             <div class="box"><span class="lead">${vec("user")}</span><input name="name" autocomplete="name" placeholder="Enter your name" aria-label="Name" value="${esc(f.name)}"></div>
@@ -622,6 +689,7 @@
             <div class="box area"><textarea id="notes" name="notes" placeholder="List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).">${esc(f.notes)}</textarea></div>
           </div>
         </form>
+        </div><div class="col">
 
         <div class="summary">
           <div class="icon">${summaryIcon()}</div>
@@ -643,11 +711,13 @@
 
         <div class="call">${vec("phone", "#000")}<span>Over $100,000? Call <a href="tel:18669712677">1 866 971-2677</a> before booking.</span></div>
         <button class="btn s3" data-act="confirm">Confirm Booking</button>
+        </div></div>
       </main>`;
   }
 
   function step4() {
     return `
+      ${topbar()}
       <main class="view s4">
         ${progress(4)}
         <div class="done">
