@@ -202,7 +202,7 @@
   .s2 .step-label, .s3 .step-label { margin-top: 0; margin-bottom: 3px; }
   .s2 .back, .s3 .back { margin-top: 10px; color: #08607c; }
   .s2 h1.title { margin: 14px 0 12px; }
-  .calendar { border: 1.1px solid #aad8e7; border-radius: 6px; padding: 11px 0 2px; }
+  .calendar { border: 1.1px solid #aad8e7; border-radius: 6px; padding: 11px 0 2px; overflow: hidden; }
   .cal-head { display: flex; align-items: center; padding: 0 5px 9px 16px; }
   .cal-head h3 { font-size: 20px; line-height: 24px; margin: 0; flex: 1; letter-spacing: -.03em; }
   .cal-head button { background: none; border: 0; padding: 0; width: 46px; height: 26px; display: flex; align-items: center; justify-content: center; }
@@ -342,6 +342,14 @@
   @keyframes slot-out { from { background-color: #087596; border-color: #087596; color: #fff; } }
   @keyframes btn-on { from { opacity: .4; } }
   @keyframes btn-off { from { opacity: 1; } }
+  .month-next { animation: month-next .2s ease; }
+  .month-prev { animation: month-prev .2s ease; }
+  @keyframes month-next { from { opacity: 0; transform: translateX(18px); } }
+  @keyframes month-prev { from { opacity: 0; transform: translateX(-18px); } }
+  .invalid .err { animation: err-in .2s ease; }
+  .invalid .box, .invalid .sq { animation: err-border .2s ease; }
+  @keyframes err-in { from { opacity: 0; transform: translateY(-4px); } }
+  @keyframes err-border { from { border-color: #a6d6e6; } }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
   }
@@ -580,7 +588,7 @@
       <main class="view s3">
         ${progress(3)}
         ${backBtn("arrow2")}
-        <h1 class="serif title">Please enter some details</h1>
+        <h1 class="serif title">Help us prepare for your visit</h1>
         <form id="details" novalidate>
           <div class="field ${bad("name")}">
             <div class="box"><span class="lead">${vec("user")}</span><input name="name" autocomplete="name" placeholder="Enter your name" aria-label="Name" value="${esc(f.name)}"></div>
@@ -735,7 +743,9 @@
       case "month": {
         const m = state.viewMonth;
         state.viewMonth = new Date(m.getFullYear(), m.getMonth() + Number(v), 1);
-        render(false); break;
+        render(false);
+        app.querySelectorAll(".cal-head h3, .cal-grid").forEach(el => el.classList.add(Number(v) > 0 ? "month-next" : "month-prev"));
+        break;
       }
       case "date": state.date = new Date(Number(v)); state.time = null; render(false); break;
       case "time": state.time = Number(v); render(false); break;
