@@ -11,7 +11,7 @@
 <title>Book an Appointment</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Figtree:wght@400&display=swap" rel="stylesheet">
 <style>
   /* Serif: ITC Bodoni Seventy-Two (the face Apple ships as "Bodoni 72").
      iPhone/iPad/Mac use the built-in Bodoni 72; Windows uses the installed ITC Bodoni Seventy-Two Pro
@@ -112,6 +112,39 @@
     /* the Kitco bar only shows on step 1 on phones */
     html:not(.shot) .app:not(.has-topbar) .topbar { display: none; }
   }
+
+  /* ---------- Site banner: Kitco bar + photo with title and EN/FR (tablet & desktop only) ---------- */
+  .site-head { display: none; }
+  @media (min-width: 600px) {
+    html:not(.shot) .topbar { display: none; }
+    html:not(.shot) .site-head { display: block; }
+    html:not(.shot) main.s1 .page-title { display: none; }
+    html:not(.shot) main.s1 .step-label { margin-top: 0; }
+  }
+  .site-bar { background: #1f2f3e; height: clamp(56px, 4.5vw, 90px); display: flex; align-items: center; padding-left: clamp(18px, 1.9vw, 38px); }
+  .site-logo { display: flex; align-items: flex-end; width: clamp(156px, 14vw, 280px); }
+  .site-logo svg { height: auto; display: block; }
+  .site-logo .ic-mark { width: 31.8%; }
+  .site-logo .kw { width: 58.3%; margin-left: 3.5%; }
+  .site-logo .reg { width: 5.7%; margin-left: .6%; align-self: flex-start; }
+  .hero {
+    position: relative; min-height: clamp(230px, 20.1vw, 402px); padding: clamp(56px, 6.2vw, 124px) 24px clamp(40px, 5.2vw, 104px);
+    background: #2c3846 url("assets/counter.jpg") center / cover no-repeat; color: #fff; text-align: center;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .hero-title { color: #fff !important; font-size: clamp(28px, 4.2vw, 84px); line-height: 1.12; margin: 0; letter-spacing: 0 !important; text-shadow: 0 1px 12px rgba(0, 0, 0, .25); }
+  .hero-sub { font: 400 clamp(16px, 2.68vw, 54px)/1.3 "Figtree", var(--sans); margin: .45em 0 0; color: #f4f6f8; text-shadow: 0 1px 10px rgba(0, 0, 0, .25); }
+  .lang {
+    position: absolute; top: clamp(14px, 1.85vw, 37px); right: clamp(14px, 2.75vw, 55px); display: flex;
+    background: #f4f6f7; border-radius: clamp(6px, .45vw, 9px); padding: 2px; box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+  }
+  .lang button {
+    border: 0; background: none; cursor: pointer; font: 700 clamp(13px, 1.1vw, 22px)/1 var(--sans); color: #1b8db1;
+    width: clamp(46px, 3.9vw, 78px); height: clamp(34px, 2.65vw, 53px); border-radius: clamp(5px, .38vw, 7px);
+    transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .lang button.active { background: #fff; color: #2b3644; box-shadow: 0 0 0 1px #dfe4e8, 0 1px 3px rgba(0, 0, 0, .12); }
+  .lang button:not(.active):hover { color: #0d6f8f; }
 
   /* layout wrappers only matter on larger screens */
   .cols, .col { display: contents; }
@@ -442,11 +475,92 @@
 
 <script>
 (() => {
-  const ADDRESS = "620 Cathcart St, Suite 900, Montréal";
   // Appointment start times offered each weekday, in minutes from midnight (9:00–11:30 AM).
   const SLOT_STARTS = [540, 570, 600, 630, 660, 690];
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  /* ---------- English / French ---------- */
+  const L = {
+    en: {
+      months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      days: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+      dow: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      docTitle: "Book an Appointment",
+      heroTitle: "Book An Appointment At Our Montreal Counter",
+      heroSub: "We look forward to your visit at 620 Cathcart St., 9th Floor.",
+      language: "Language", menu: "Menu",
+      bookTitle: "Book an Appointment", step: n => `Step ${n} of 4`,
+      whatDo: "What would you like to do?", buy: "Buy", sell: "Sell",
+      buyDesc: "Purchase gold, silver and other precious metals.", sellDesc: "Sell your gold, silver and other precious metals.",
+      howLong: "How much time do you need?", duration: "Duration",
+      d30: "If you know exactly which bullion products you want to buy or sell, or to pick up an order placed online.",
+      d60: "If you’d like help deciding which bullion products to buy, or if you’d like to sell items like old jewelry, scrap, silverware, etc.",
+      d120: "For business appointments that need extra time, or if we’ve asked you to book 2 hours.",
+      minutes: m => `${m} minutes`, hours: h => `${h} hours`,
+      cont: "Continue", back: "Back",
+      chooseDate: "Choose a date &amp; time", prevMonth: "Previous month", nextMonth: "Next month", unavailable: " (unavailable)",
+      prepare: "Help us prepare for your visit",
+      namePh: "Enter your name", nameLbl: "Name", emailPh: "Enter email address", emailLbl: "Email address",
+      phone: "Phone number", ccLbl: "Country code",
+      value: "Estimated transaction value (CAD)", valueLbl: "Estimated transaction value in Canadian dollars",
+      account: "Do you have a Kitco account?", yes: "Yes", no: "No",
+      notesLbl: "Please provide more details to help us prepare for your visit",
+      notesPh: "List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).",
+      buyBullion: "Buy Bullion", sellBullion: "Sell Bullion", buySell: "Buy &amp; Sell", mtlTime: "Montréal time",
+      address: "620 Cathcart St, Suite 900, Montréal",
+      terms: 'I accept the SimplyBook.me <a href="https://simplybook.me/en/terms-and-conditions" target="_blank" rel="noopener">terms and conditions</a>',
+      promos: "Send me promotions and helpful information.",
+      call: 'Over $100,000? Call <a href="tel:18669712677">1 866 971-2677</a> before booking.',
+      confirm: "Confirm Booking",
+      success: "Success!", thanks: "Thanks, your appointment is booked! We’ve sent a confirmation email with all of the information you’ll need. See you soon!",
+      close: "Close",
+      eName: "Please enter your name.", eEmail: "Please enter a valid email address.", eValue: "Please enter an estimated value.",
+      eAccount: "Please choose Yes or No.", eTerms: "Please accept the terms and conditions.",
+    },
+    fr: {
+      months: ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],
+      days: ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"],
+      dow: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"],
+      docTitle: "Prendre rendez-vous",
+      heroTitle: "Prenez rendez-vous à notre comptoir de Montréal",
+      heroSub: "Au plaisir de vous accueillir au 620, rue Cathcart, 9e étage.",
+      language: "Langue", menu: "Menu",
+      bookTitle: "Prendre rendez-vous", step: n => `Étape ${n} de 4`,
+      whatDo: "Que souhaitez-vous faire?", buy: "Acheter", sell: "Vendre",
+      buyDesc: "Achetez de l’or, de l’argent et d’autres métaux précieux.", sellDesc: "Vendez votre or, votre argent et vos autres métaux précieux.",
+      howLong: "De combien de temps avez-vous besoin?", duration: "Durée",
+      d30: "Si vous savez exactement quels produits de lingots acheter ou vendre, ou pour récupérer une commande passée en ligne.",
+      d60: "Si vous souhaitez de l’aide pour choisir des produits de lingots, ou si vous voulez vendre de vieux bijoux, des débris de métaux, de l’argenterie, etc.",
+      d120: "Pour les rendez-vous d’affaires qui demandent plus de temps, ou si nous vous avons demandé de réserver 2 heures.",
+      minutes: m => `${m} minutes`, hours: h => `${h} heures`,
+      cont: "Continuer", back: "Retour",
+      chooseDate: "Choisissez une date et une heure", prevMonth: "Mois précédent", nextMonth: "Mois suivant", unavailable: " (non disponible)",
+      prepare: "Aidez-nous à préparer votre visite",
+      namePh: "Entrez votre nom", nameLbl: "Nom", emailPh: "Entrez votre adresse courriel", emailLbl: "Adresse courriel",
+      phone: "Numéro de téléphone", ccLbl: "Indicatif de pays",
+      value: "Valeur estimée de la transaction ($ CA)", valueLbl: "Valeur estimée de la transaction en dollars canadiens",
+      account: "Avez-vous un compte Kitco?", yes: "Oui", no: "Non",
+      notesLbl: "Donnez-nous plus de détails pour nous aider à préparer votre visite",
+      notesPh: "Indiquez les articles que vous souhaitez acheter ou vendre et leurs quantités, vos préférences de paiement ou de versement, ainsi que votre numéro de compte Kitco (le cas échéant).",
+      buyBullion: "Achat de lingots", sellBullion: "Vente de lingots", buySell: "Achat et vente", mtlTime: "heure de Montréal",
+      address: "620, rue Cathcart, bureau 900, Montréal",
+      terms: 'J’accepte les <a href="https://simplybook.me/fr/terms-and-conditions" target="_blank" rel="noopener">conditions générales</a> de SimplyBook.me',
+      promos: "Envoyez-moi des promotions et des renseignements utiles.",
+      call: 'Plus de 100 000 $? Appelez au <a href="tel:18669712677">1 866 971-2677</a> avant de réserver.',
+      confirm: "Confirmer le rendez-vous",
+      success: "Confirmé!", thanks: "Merci, votre rendez-vous est réservé! Nous vous avons envoyé un courriel de confirmation avec tous les renseignements nécessaires. À bientôt!",
+      close: "Fermer",
+      eName: "Veuillez entrer votre nom.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez entrer une valeur estimée.",
+      eAccount: "Veuillez choisir Oui ou Non.", eTerms: "Veuillez accepter les conditions générales.",
+    },
+  };
+  // ?lang=fr link, then the saved choice, otherwise the device language
+  let lang = (() => {
+    const q = new URLSearchParams(location.search).get("lang");
+    if (q === "en" || q === "fr") return q;
+    try { const saved = localStorage.getItem("lang"); if (saved === "en" || saved === "fr") return saved; } catch (e) {}
+    return /^fr\b/i.test(navigator.language || "") ? "fr" : "en";
+  })();
+  const T = () => L[lang];
 
   // Vector outlines traced from the design mockups: [width, height, colour, path].
   const TRACED = {
@@ -471,10 +585,11 @@
     const [w, h, c, d] = TRACED[name];
     return `<svg class="ic-${name}" width="${+(w * scale).toFixed(2)}" height="${+(h * scale).toFixed(2)}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path fill="${fill || c}" fill-rule="evenodd" d="${d}"/></svg>`;
   };
-  const WORDMARK = (() => {
+  // silver KITCO lettering; each copy needs its own gradient id
+  const wordmark = (id, cls = "") => {
     const [w, h, , d] = TRACED.word;
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><defs><linearGradient id="kw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="1" stop-color="#c3c8ce"/></linearGradient></defs><path fill="url(#kw)" fill-rule="evenodd" d="${d}"/></svg>`;
-  })();
+    return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="1" stop-color="#c3c8ce"/></linearGradient></defs><path fill="url(#${id})" fill-rule="evenodd" d="${d}"/></svg>`;
+  };
 
   const icon = {
     tick: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg>`,
@@ -499,16 +614,23 @@
   const today = () => { const d = now(); d.setHours(0, 0, 0, 0); return d; };
   const sameDay = (a, b) => a && b && a.getTime() === b.getTime();
   const fmtTime = (m, suffix = true) => {
-    const h = Math.floor(m / 60), h12 = ((h + 11) % 12) + 1;
-    return `${h12}:${String(m % 60).padStart(2, "0")}${suffix ? (h < 12 ? " AM" : " PM") : ""}`;
+    const h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0");
+    if (lang === "fr") return `${h} h ${mm}`;
+    const h12 = ((h + 11) % 12) + 1;
+    return `${h12}:${mm}${suffix ? (h < 12 ? " AM" : " PM") : ""}`;
   };
   const fmtRange = (start, len) => {
     const end = start + len;
+    if (lang === "fr") return `${fmtTime(start)} à ${fmtTime(end)}`;
     return (start < 720) === (end < 720) ? `${fmtTime(start, false)}–${fmtTime(end)}` : `${fmtTime(start)}–${fmtTime(end)}`;
   };
-  const fmtDuration = m => m > 60 ? `${m / 60} hours` : `${m} minutes`;
-  const fmtLongDate = (d, year = false) => `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}${year ? ", " + d.getFullYear() : ""}`;
-  const intentLabel = () => state.buy && state.sell ? "Buy &amp; Sell" : state.buy ? "Buy Bullion" : "Sell Bullion";
+  const fmtDuration = m => m > 60 ? T().hours(m / 60) : T().minutes(m);
+  const fmtLongDate = (d, year = false) => {
+    const t = T();
+    if (lang === "fr") return `${t.days[d.getDay()]} ${d.getDate() === 1 ? "1er" : d.getDate()} ${t.months[d.getMonth()]}${year ? " " + d.getFullYear() : ""}`;
+    return `${t.days[d.getDay()]}, ${t.months[d.getMonth()]} ${d.getDate()}${year ? ", " + d.getFullYear() : ""}`;
+  };
+  const intentLabel = () => state.buy && state.sell ? T().buySell : state.buy ? T().buyBullion : T().sellBullion;
   // Success ring + check, traced; the check is revealed left to right so it looks drawn.
   const successIcon = () => {
     const [w, h, c, d] = TRACED.success, k = .85;
@@ -546,40 +668,53 @@
 
   /* ---------- shared fragments ---------- */
   const progress = step => `
-    <div class="step-label">Step ${step} of 4</div>
+    <div class="step-label">${T().step(step)}</div>
     <div class="progress ${step === 4 ? "full" : ""}" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${step}">
       ${[1, 2, 3, 4].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}
     </div>`;
-  const backBtn = name => `<button class="back" data-act="back">${vec(name, "currentColor")}Back</button>`;
+  const backBtn = name => `<button class="back" data-act="back">${vec(name, "currentColor")}${T().back}</button>`;
 
+  const REG = `<svg class="reg" width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><circle cx="3.5" cy="3.5" r="3.05" fill="none" stroke="#d3d7dc" stroke-width=".6"/><text x="3.55" y="5.05" text-anchor="middle" font-family="Lato, sans-serif" font-weight="700" font-size="4.3" fill="#d3d7dc">R</text></svg>`;
   const topbar = () => `
+      <header class="site-head">
+        <div class="site-bar"><span class="site-logo" role="img" aria-label="Kitco">${vec("mark")}${wordmark("kw-site", "kw")}${REG}</span></div>
+        <div class="hero">
+          <div class="lang" role="group" aria-label="${T().language}">
+            <button data-act="lang" data-v="en" class="${lang === "en" ? "active" : ""}" aria-pressed="${lang === "en"}" lang="en">EN</button>
+            <button data-act="lang" data-v="fr" class="${lang === "fr" ? "active" : ""}" aria-pressed="${lang === "fr"}" lang="fr">FR</button>
+          </div>
+          <h1 class="serif hero-title">${T().heroTitle}</h1>
+          <p class="hero-sub">${T().heroSub}</p>
+        </div>
+      </header>
       <header class="topbar">
         <div class="bar">
-          <button class="menu" aria-label="Menu">${vec("menu", "#fff")}</button>
+          <button class="menu" aria-label="${T().menu}">${vec("menu", "#fff")}</button>
           <span class="mark" role="img" aria-label="Kitco">${vec("mark")}</span>
-          <span class="word">${WORDMARK}</span>
-          <svg class="reg" width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><circle cx="3.5" cy="3.5" r="3.05" fill="none" stroke="#d3d7dc" stroke-width=".6"/><text x="3.55" y="5.05" text-anchor="middle" font-family="Lato, sans-serif" font-weight="700" font-size="4.3" fill="#d3d7dc">R</text></svg>
+          <span class="word">${wordmark("kw")}</span>
+          ${REG}
         </div>
       </header>`;
 
   /* ---------- screens ---------- */
   function step1() {
+    const t = T();
     const intents = [
-      { id: "buy", name: "Buy", desc: "Purchase gold, silver and other precious metals.", ic: vec("cart", "#000", .8) },
-      { id: "sell", name: "Sell", desc: "Sell your gold, silver and other precious metals.", ic: vec("box", "#000", .8) },
+      { id: "buy", name: t.buy, desc: t.buyDesc, ic: vec("cart", "#000", .8) },
+      { id: "sell", name: t.sell, desc: t.sellDesc, ic: vec("box", "#000", .8) },
     ];
     const durations = [
-      { m: 30, name: "30 minutes", desc: "If you know exactly which bullion products you want to buy or sell, or to pick up an order placed online." },
-      { m: 60, name: "60 minutes", desc: "If you’d like help deciding which bullion products to buy, or if you’d like to sell items like old jewelry, scrap, silverware, etc." },
-      { m: 120, name: "2 hours", desc: "For business appointments that need extra time, or if we’ve asked you to book 2 hours." },
+      { m: 30, name: fmtDuration(30), desc: t.d30 },
+      { m: 60, name: fmtDuration(60), desc: t.d60 },
+      { m: 120, name: fmtDuration(120), desc: t.d120 },
     ];
     return `
       ${topbar()}
       <main class="view s1">
-        <h1 class="serif page-title">Book an Appointment</h1>
+        <h1 class="serif page-title">${t.bookTitle}</h1>
         ${progress(1)}
         <div class="cols"><div class="col">
-        <h2 class="serif section">What would you like to do?</h2>
+        <h2 class="serif section">${t.whatDo}</h2>
         ${intents.map(o => `
           <button class="card intent ${state[o.id] ? "on" : ""}" role="checkbox" aria-checked="${state[o.id]}" data-act="intent" data-v="${o.id}">
             <span class="icon">${o.ic}</span>
@@ -589,8 +724,8 @@
             </span>
           </button>`).join("")}
         </div><div class="col">
-        <h2 class="serif section second">How much time do you need?</h2>
-        <div role="radiogroup" aria-label="Duration">
+        <h2 class="serif section second">${t.howLong}</h2>
+        <div role="radiogroup" aria-label="${t.duration}">
         ${durations.map(o => `
           <button class="card duration ${state.duration === o.m ? "on" : ""}" role="radio" aria-checked="${state.duration === o.m}" data-act="duration" data-v="${o.m}">
             <span class="dot-radio"></span>
@@ -602,91 +737,92 @@
         </div>
         </div></div>
         <div class="grow"></div>
-        <button class="btn s1" data-act="next" ${(state.buy || state.sell) && state.duration ? "" : "disabled"}>Continue</button>
+        <button class="btn s1" data-act="next" ${(state.buy || state.sell) && state.duration ? "" : "disabled"}>${t.cont}</button>
       </main>`;
   }
 
   function step2() {
+    const t = T();
     const vm = state.viewMonth, y = vm.getFullYear(), mo = vm.getMonth();
     const lead = new Date(y, mo, 1).getDay(), count = new Date(y, mo + 1, 0).getDate();
-    const t = today(), atFirstMonth = y === t.getFullYear() && mo === t.getMonth();
+    const td = today(), atFirstMonth = y === td.getFullYear() && mo === td.getMonth();
     let cells = "";
     for (let i = 0; i < lead; i++) cells += "<span></span>";
     for (let d = 1; d <= count; d++) {
       const date = new Date(y, mo, d), open = isBookable(date);
-      cells += `<button class="day ${sameDay(date, state.date) ? "on" : ""}" data-act="date" data-v="${date.getTime()}" ${open ? "" : "disabled"} aria-label="${fmtLongDate(date)}${open ? "" : " (unavailable)"}"><span class="num">${d}</span><span class="dot"></span></button>`;
+      cells += `<button class="day ${sameDay(date, state.date) ? "on" : ""}" data-act="date" data-v="${date.getTime()}" ${open ? "" : "disabled"} aria-label="${fmtLongDate(date)}${open ? "" : t.unavailable}"><span class="num">${d}</span><span class="dot"></span></button>`;
     }
     return `
       ${topbar()}
       <main class="view s2">
         ${progress(2)}
         ${backBtn("arrow2")}
-        <h1 class="serif title">Choose a date &amp; time</h1>
+        <h1 class="serif title">${t.chooseDate}</h1>
         <div class="cols"><div class="col">
         <div class="calendar">
           <div class="cal-head">
-            <h3 class="serif">${MONTHS[mo]} ${y}</h3>
-            <button data-act="month" data-v="-1" aria-label="Previous month" ${atFirstMonth ? "disabled" : ""}>${vec("chevL")}</button>
-            <button data-act="month" data-v="1" aria-label="Next month">${vec("chevR")}</button>
+            <h3 class="serif">${lang === "fr" ? t.months[mo][0].toUpperCase() + t.months[mo].slice(1) : t.months[mo]} ${y}</h3>
+            <button data-act="month" data-v="-1" aria-label="${t.prevMonth}" ${atFirstMonth ? "disabled" : ""}>${vec("chevL")}</button>
+            <button data-act="month" data-v="1" aria-label="${t.nextMonth}">${vec("chevR")}</button>
           </div>
           <div class="cal-grid">
-            ${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => `<span class="dow">${d}</span>`).join("")}
+            ${t.dow.map(d => `<span class="dow">${d}</span>`).join("")}
             ${cells}
           </div>
         </div>
         </div><div class="col">
         ${state.date ? `
-          <h2 class="serif section">${fmtLongDate(state.date)}</h2>
+          <h2 class="serif section">${lang === "fr" ? fmtLongDate(state.date).replace(/^./, c => c.toUpperCase()) : fmtLongDate(state.date)}</h2>
           <div class="slots">
             ${slotsFor(state.date).map(s => `<button class="slot ${state.time === s.m ? "on" : ""}" data-act="time" data-v="${s.m}" ${s.disabled ? "disabled" : ""}>${fmtTime(s.m)}</button>`).join("")}
           </div>` : ""}
         </div></div>
         <div class="grow"></div>
-        <button class="btn s2" data-act="next" ${state.date && state.time != null ? "" : "disabled"}>Continue</button>
+        <button class="btn s2" data-act="next" ${state.date && state.time != null ? "" : "disabled"}>${t.cont}</button>
       </main>`;
   }
 
   function step3() {
-    const f = state.form, err = validate();
+    const t = T(), f = state.form, err = validate();
     const bad = k => state.showErrors && err[k] ? "invalid" : "";
     return `
       ${topbar()}
       <main class="view s3">
         ${progress(3)}
         ${backBtn("arrow2")}
-        <h1 class="serif title">Help us prepare for your visit</h1>
+        <h1 class="serif title">${t.prepare}</h1>
         <div class="cols"><div class="col">
         <form id="details" novalidate>
           <div class="field ${bad("name")}">
-            <div class="box"><span class="lead">${vec("user")}</span><input name="name" autocomplete="name" placeholder="Enter your name" aria-label="Name" value="${esc(f.name)}"></div>
+            <div class="box"><span class="lead">${vec("user")}</span><input name="name" autocomplete="name" placeholder="${t.namePh}" aria-label="${t.nameLbl}" value="${esc(f.name)}"></div>
             <div class="err">${err.name || ""}</div>
           </div>
           <div class="field ${bad("email")}">
-            <div class="box"><span class="lead">${vec("mail")}</span><input name="email" type="email" inputmode="email" autocomplete="email" placeholder="Enter email address" aria-label="Email address" value="${esc(f.email)}"></div>
+            <div class="box"><span class="lead">${vec("mail")}</span><input name="email" type="email" inputmode="email" autocomplete="email" placeholder="${t.emailPh}" aria-label="${t.emailLbl}" value="${esc(f.email)}"></div>
             <div class="err">${err.email || ""}</div>
           </div>
           <div class="field">
-            <label class="label" for="phone">Phone number</label>
+            <label class="label" for="phone">${t.phone}</label>
             <div class="box short">
-              <span class="plus" aria-hidden="true">+</span><input class="cc" name="cc" type="tel" inputmode="numeric" autocomplete="tel-country-code" maxlength="4" aria-label="Country code" value="${esc(f.cc.slice(1))}"><span class="vsep"></span>
-              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="${f.cc === "+1" ? "(555) 123-4567" : "Phone number"}" value="${esc(f.phone)}">
+              <span class="plus" aria-hidden="true">+</span><input class="cc" name="cc" type="tel" inputmode="numeric" autocomplete="tel-country-code" maxlength="4" aria-label="${t.ccLbl}" value="${esc(f.cc.slice(1))}"><span class="vsep"></span>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="${f.cc === "+1" ? "(555) 123-4567" : t.phone}" value="${esc(f.phone)}">
             </div>
           </div>
           <div class="field ${bad("value")}">
-            <label class="label" for="value">Estimated transaction value (CAD)</label>
-            <div class="box shorter"><input id="value" name="value" inputmode="numeric" aria-label="Estimated transaction value in Canadian dollars" value="${esc(f.value)}"></div>
+            <label class="label" for="value">${t.value}</label>
+            <div class="box shorter"><input id="value" name="value" inputmode="numeric" aria-label="${t.valueLbl}" value="${esc(f.value)}"></div>
             <div class="err">${err.value || ""}</div>
           </div>
           <div class="field gap ${bad("account")}">
-            <span class="label">Do you have a Kitco account?</span>
-            <div class="radios" role="radiogroup" aria-label="Do you have a Kitco account?">
-              ${["Yes", "No"].map(v => `<label><input type="radio" name="account" value="${v}" ${f.account === v ? "checked" : ""}><span class="ring"></span>${v}</label>`).join("")}
+            <span class="label">${t.account}</span>
+            <div class="radios" role="radiogroup" aria-label="${t.account}">
+              ${[["Yes", t.yes], ["No", t.no]].map(([v, label]) => `<label><input type="radio" name="account" value="${v}" ${f.account === v ? "checked" : ""}><span class="ring"></span>${label}</label>`).join("")}
             </div>
             <div class="err">${err.account || ""}</div>
           </div>
           <div class="field gap">
-            <label class="label" for="notes">Please provide more details to help us prepare for your visit</label>
-            <div class="box area"><textarea id="notes" name="notes" placeholder="List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).">${esc(f.notes)}</textarea></div>
+            <label class="label" for="notes">${t.notesLbl}</label>
+            <div class="box area"><textarea id="notes" name="notes" placeholder="${t.notesPh}">${esc(f.notes)}</textarea></div>
           </div>
         </form>
         </div><div class="col">
@@ -696,47 +832,48 @@
           <div>
             <div class="serif headline">${intentLabel()}<span class="sep">•</span>${fmtDuration(state.duration)}</div>
             <div class="row">${vec("cal", "#000")}${fmtLongDate(state.date, true)}</div>
-            <div class="row">${vec("clock", "#000")}<span>${fmtRange(state.time, state.duration)}<span class="sep">•</span>Montréal time</span></div>
-            <div class="row">${vec("pin", "#000")}${ADDRESS}</div>
+            <div class="row">${vec("clock", "#000")}<span>${fmtRange(state.time, state.duration)}<span class="sep">•</span>${t.mtlTime}</span></div>
+            <div class="row">${vec("pin", "#000")}${t.address}</div>
           </div>
         </div>
 
         <div class="checks">
           <div class="${bad("terms")}">
-            <label><input type="checkbox" name="terms" ${f.terms ? "checked" : ""}><span class="sq">${icon.tick(12)}</span><span>I accept the SimplyBook.me <a href="https://simplybook.me/en/terms-and-conditions" target="_blank" rel="noopener">terms and conditions</a></span></label>
+            <label><input type="checkbox" name="terms" ${f.terms ? "checked" : ""}><span class="sq">${icon.tick(12)}</span><span>${t.terms}</span></label>
             <div class="err" style="margin:-4px 0 10px">${err.terms || ""}</div>
           </div>
-          <label><input type="checkbox" name="promos" ${f.promos ? "checked" : ""}><span class="sq">${icon.tick(12)}</span><span>Send me promotions and helpful information.</span></label>
+          <label><input type="checkbox" name="promos" ${f.promos ? "checked" : ""}><span class="sq">${icon.tick(12)}</span><span>${t.promos}</span></label>
         </div>
 
-        <div class="call">${vec("phone", "#000")}<span>Over $100,000? Call <a href="tel:18669712677">1 866 971-2677</a> before booking.</span></div>
-        <button class="btn s3" data-act="confirm">Confirm Booking</button>
+        <div class="call">${vec("phone", "#000")}<span>${t.call}</span></div>
+        <button class="btn s3" data-act="confirm">${t.confirm}</button>
         </div></div>
       </main>`;
   }
 
   function step4() {
+    const t = T();
     return `
       ${topbar()}
       <main class="view s4">
         ${progress(4)}
         <div class="done">
           ${successIcon()}
-          <h1 class="serif">Success!</h1>
-          <p>Thanks, your appointment is booked! We’ve sent a confirmation email with all of the information you’ll need. See you soon!</p>
-          <button class="btn s4" data-act="close">Close</button>
+          <h1 class="serif">${t.success}</h1>
+          <p>${t.thanks}</p>
+          <button class="btn s4" data-act="close">${t.close}</button>
         </div>
       </main>`;
   }
 
   function validate() {
-    const f = state.form, e = {};
-    if (!f.name.trim()) e.name = "Please enter your name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = "Please enter a valid email address.";
+    const t = T(), f = state.form, e = {};
+    if (!f.name.trim()) e.name = t.eName;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = t.eEmail;
     const v = Number(digits(f.value));
-    if (!v) e.value = "Please enter an estimated value.";
-    if (!f.account) e.account = "Please choose Yes or No.";
-    if (!f.terms) e.terms = "Please accept the terms and conditions.";
+    if (!v) e.value = t.eValue;
+    if (!f.account) e.account = t.eAccount;
+    if (!f.terms) e.terms = t.eTerms;
     return e;
   }
 
@@ -746,6 +883,8 @@
     // remember what was selected / enabled so the changes can be animated
     const wasOn = new Set([...app.querySelectorAll("[data-v].on")].map(key));
     const btnBefore = app.querySelector(".btn[data-act=next]")?.disabled;
+    document.documentElement.lang = lang;
+    document.title = T().docTitle;
     app.className = "app" + (state.step === 1 ? " has-topbar" : "") + (newStep ? "" : " still");
     app.innerHTML = [null, step1, step2, step3, step4][state.step]();
     if (!newStep) {
@@ -802,6 +941,9 @@
     const v = el.dataset.v;
     switch (el.dataset.act) {
       case "intent": state[v] = !state[v]; render(false); break;
+      case "lang":
+        if (v !== lang) { lang = v; try { localStorage.setItem("lang", v); } catch (e) {} render(false); }
+        break;
       case "duration": state.duration = Number(v); render(false); break;
       case "back": go(state.step - 1); break;
       case "next":
@@ -861,6 +1003,7 @@
 
   if (shot) {
     document.documentElement.classList.add("shot");
+    if (!new URLSearchParams(location.search).get("lang")) lang = "en";
     if (shot > 1) Object.assign(state, { step: shot, buy: true, duration: 30, date: new Date(2026, 9, 20), viewMonth: new Date(2026, 9, 1), time: 600 });
   }
   render();
