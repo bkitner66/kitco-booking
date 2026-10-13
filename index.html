@@ -13,20 +13,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-  /* Serif: ITC Bodoni Seventy-Two Book (the face Apple ships as "Bodoni 72").
-     It is picked up from the device when installed, or from ./fonts/ if a web-licensed copy is added. */
+  /* Serif: ITC Bodoni Seventy-Two (the face Apple ships as "Bodoni 72").
+     iPhone/iPad/Mac use the built-in Bodoni 72; Windows uses the installed ITC Bodoni Seventy-Two Pro;
+     ./fonts/ is only for a web-licensed copy. */
   @font-face {
     font-family: "Bodoni72";
-    src: local("Bodoni Svntytwo ITC Pro Book"), local("BodoniSvntytwoITCPro-Book"),
-         local("Bodoni 72 Book"), local("Bodoni72-Book"), local("Bodoni 72"),
+    src: local("BodoniSvtyTwoITCTT-Book"), local("Bodoni 72 Book"),
+         local("Bodoni Svntytwo ITC Pro Book"), local("BodoniSvntytwoITCPro-Book"),
          url("fonts/BodoniSevITCPro-Book.woff2") format("woff2"),
          url("fonts/BodoniSevITCPro-Book.otf") format("opentype");
     font-weight: 400;
     font-display: swap;
   }
+  @font-face {
+    font-family: "Bodoni72";
+    src: local("BodoniSvtyTwoITCTT-Bold"), local("Bodoni 72 Bold");
+    font-weight: 700;
+    font-display: swap;
+  }
 
   :root {
-    --serif: "Bodoni72", "Bodoni MT", Didot, Georgia, serif;
+    --serif: "Bodoni72", "Bodoni 72", "Bodoni MT", Georgia, serif;
     --sans: "Lato", system-ui, -apple-system, sans-serif;
     --ink: #0e1a45;
     --text: #13235a;
