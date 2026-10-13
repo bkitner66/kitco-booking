@@ -1,0 +1,4 @@
+# Only the app is published; design references and fonts stay local.
+mockups/
+_cmp/
+fonts/
