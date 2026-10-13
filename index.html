@@ -174,6 +174,39 @@
     html:not(.shot) main.s1 .cols, html:not(.shot) main.s3 .cols { display: flex; flex-direction: column; zoom: var(--k, 1); }
   }
 
+  /* ---------- Kitco site menu (same contents as the online.kitco.com hamburger) ---------- */
+  .site-menu { background: none; border: 0; padding: 6px; margin: 0 clamp(10px, 1.1vw, 22px) 0 -6px; display: flex; cursor: pointer; }
+  .site-menu svg { width: clamp(22px, 1.9vw, 38px); height: auto; }
+  .kmenu { position: fixed; inset: 0; z-index: 50; visibility: hidden; font-family: Arial, Helvetica, sans-serif; }
+  .kmenu.open { visibility: visible; }
+  .km-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); opacity: 0; transition: opacity .25s ease; }
+  .kmenu.open .km-backdrop { opacity: 1; }
+  .km-panel {
+    position: absolute; inset: 0 auto 0 0; width: min(400px, 100vw); background: #fff; display: flex; flex-direction: column;
+    transform: translateX(-100%); transition: transform .25s ease; box-shadow: 0 0 24px rgba(0, 0, 0, .2);
+  }
+  .kmenu.open .km-panel { transform: none; }
+  .km-head { background: #293343; color: #fff; font-size: 14px; padding: calc(16px + env(safe-area-inset-top)) 16px 16px 20px; display: flex; align-items: center; gap: 12px; flex: none; }
+  .km-head > div { flex: 1; }
+  .km-head a { color: #ebbc4e; text-decoration: none; }
+  .km-close { background: none; border: 0; color: #fff; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .km-pages { position: relative; flex: 1; overflow: hidden; }
+  .km-page { position: absolute; inset: 0; overflow-y: auto; padding: 8px 20px 32px; transition: transform .25s ease; background: #fff; }
+  .km-sub { transform: translateX(100%); padding-top: 0; }
+  .kmenu.sub .km-main { transform: translateX(-30%); }
+  .kmenu.sub .km-sub { transform: none; }
+  .km-page a { color: #333; text-decoration: none; }
+  .km-h { display: block; font-weight: 700; font-size: 18px; padding: 8px 0; }
+  .km-page hr { border: 0; border-top: 1px solid #f4f4f7; margin: 4px 0; }
+  .km-page ul { list-style: none; margin: 0 0 6px; padding: 0; }
+  .km-page li > a, .km-page li > button { display: flex; justify-content: space-between; align-items: center; width: 100%; font: 400 16px/1.25 Arial, Helvetica, sans-serif; color: #333; padding: 7px 0; background: none; border: 0; text-align: left; cursor: pointer; }
+  .km-page li > button::after { content: "›"; font-size: 22px; line-height: 1; color: #777; }
+  .km-page a.deal { color: #cf4055; }
+  .km-page a:hover, .km-page li > button:hover { color: #0a7bab; }
+  .km-back { position: sticky; top: 0; background: #f4f4f7; margin: 0 -20px 8px; padding: 12px 20px; }
+  .km-back button { background: none; border: 0; padding: 0; font: 700 16px Arial, Helvetica, sans-serif; color: #333; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .km-group { font-weight: 700; font-size: 16px; padding: 10px 0 2px; display: block; }
+
   /* layout wrappers only matter on larger screens */
   .cols, .col { display: contents; }
 
@@ -501,6 +534,8 @@
   </div>
 </div>
 
+<div class="kmenu" id="kmenu" role="dialog" aria-modal="true" aria-label="Kitco menu"></div>
+
 <script>
 (() => {
   // Appointment start times offered each weekday, in minutes from midnight (9:00–11:30 AM).
@@ -516,6 +551,7 @@
       heroTitle: "Book An Appointment At Our Montreal Counter",
       heroSub: "We look forward to your visit at 620 Cathcart St., 9th Floor.",
       language: "Language", menu: "Menu",
+      hello: "Hello,", logIn: "Log In", or: "or", createAccount: "Create Account", closeMenu: "Close menu",
       bookTitle: "Book an Appointment", step: n => `Step ${n} of 4`,
       whatDo: "What would you like to do?", buy: "Buy", sell: "Sell",
       buyDesc: "Purchase gold, silver and other precious metals.", sellDesc: "Sell your gold, silver and other precious metals.",
@@ -552,6 +588,7 @@
       heroTitle: "Prenez rendez-vous à notre comptoir de Montréal",
       heroSub: "Au plaisir de vous accueillir au 620, rue Cathcart, 9e étage.",
       language: "Langue", menu: "Menu",
+      hello: "Bonjour,", logIn: "Ouvrir une session", or: "ou", createAccount: "Créer un compte", closeMenu: "Fermer le menu",
       bookTitle: "Prendre rendez-vous", step: n => `Étape ${n} de 4`,
       whatDo: "Que souhaitez-vous faire?", buy: "Acheter", sell: "Vendre",
       buyDesc: "Achetez de l’or, de l’argent et d’autres métaux précieux.", sellDesc: "Vendez votre or, votre argent et vos autres métaux précieux.",
@@ -705,7 +742,7 @@
   const REG = `<svg class="reg" width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><circle cx="3.5" cy="3.5" r="3.05" fill="none" stroke="#d3d7dc" stroke-width=".6"/><text x="3.55" y="5.05" text-anchor="middle" font-family="Lato, sans-serif" font-weight="700" font-size="4.3" fill="#d3d7dc">R</text></svg>`;
   const topbar = () => `
       <header class="site-head">
-        <div class="site-bar"><span class="site-logo" role="img" aria-label="Kitco">${vec("mark")}${wordmark("kw-site", "kw")}${REG}</span></div>
+        <div class="site-bar"><button class="site-menu" data-act="menu" aria-label="${T().menu}" aria-haspopup="dialog">${vec("menu", "#fff")}</button><span class="site-logo" role="img" aria-label="Kitco">${vec("mark")}${wordmark("kw-site", "kw")}${REG}</span></div>
         <div class="lang" role="group" aria-label="${T().language}">
           <button data-act="lang" data-v="en" class="${lang === "en" ? "active" : ""}" aria-pressed="${lang === "en"}" lang="en">EN</button>
           <button data-act="lang" data-v="fr" class="${lang === "fr" ? "active" : ""}" aria-pressed="${lang === "fr"}" lang="fr">FR</button>
@@ -723,6 +760,116 @@
           ${REG}
         </div>
       </header>`;
+
+  /* ---------- Kitco site menu: mirrors the hamburger menu on online.kitco.com ---------- */
+  const KITCO = "https://online.kitco.com";
+  const MENU = [
+    { h: "Home", href: "/" },
+    { h: "Reset Password", href: "/account/resetpassword/step1.html" },
+    { h: "Buy from Kitco", href: "/buy/gold-silver.html", items: [
+      ["All Products", "/buy/gold-silver.html"], ["In Stock Now", "/search?page=1&q=kitcobullion&minprice=1"],
+      ["VaultChain™ Gold", "/kitco-vault-chain-gold"], ["VaultChain™ Silver", "/kitco-vault-chain-silver"],
+      ["Kitco Pool - Metal Accounts", "/kitco-pool"], ["Deals", "/deals", "deal"], ["Gift Ideas", "/gift-ideas"],
+      ["Cool and Collectible", "/cool-and-collectible"], ["Gold", "#gold"], ["Silver", "#silver"], ["Platinum", "#platinum"],
+      ["Palladium", "/palladium"], ["Rhodium", "/rhodium"], ["MintFirst™", "/kitco-mint-first-coins"], ["Bullion Mints", "#mints"],
+      ["Kitco Exclusives", "/unique-gold-silver-exclusive"], ["Bundle Products", "/bundle-products"], ["Accessories", "/accessories"]] },
+    { h: "Sell to Kitco", href: "/sell/gold-silver.html?v=201811031", items: [
+      ["Coins and Bars", "/sell/gold-silver.html?v=201811031"], ["Other Products", "/sell/others.html"], ["Rhodium", "/sell/rhodium.html"],
+      ["Sell VaultChain™ Gold", "/kitco-vault-chain-gold#sell"], ["Sell VaultChain™ Silver", "/kitco-vault-chain-silver#sell"],
+      ["Sell Kitco Pool - Metal Accounts", "/kitco-pool#sell"], ["Refining and Scrap", "/refining/gold-silver.html"],
+      ["Selling Your Bullion", "/selling-bullion-bars-coins"]] },
+    { h: "Storage Programs", href: "/storage", items: [
+      ["Kitco Allocated Storage Program", "/storage"], ["Cayman Storage Program", "/cayman-storage-program"], ["IRA | RSP", "/ira-rsp/"]] },
+    { h: "Refining Services", href: "/refining", items: [
+      ["Jeweler Resources", "https://www.kitco.com/jeweler-resources"], ["Scrap Metal Calculator", "https://www.kitco.com/jeweler-resources"],
+      ["Refining and Scrap", "/refining/gold-silver.html"]] },
+    { h: "My Account", href: "/account/details.html", items: [
+      ["Create Account", "/create-account.html?fp=/"], ["Check Transaction Status", "/account/details.html"],
+      ["Forgot Email / Username", "/account/forgotusername/step1.html"], ["Reset Password", "/account/resetpassword/step1.html"]] },
+    { h: "Education", href: "/bullion-education/", items: [
+      ["Basic Understanding", "/bullion-education/basic-understanding/"], ["Fundamentals", "/fundamentals/"],
+      ["Investment Guide", "/bullion-investment-guide/"], ["Local Dealers", "/local/"], ["Bullion Terminology", "/bullion-terminology/"],
+      ["Why Choose Kitco", "/why-choose-kitco/"]] },
+    { h: "FAQs", href: "/faq", items: [
+      ["How do I Open a Kitco Account", "/faq/opening-an-account"], ["Account Maintenance", "/faq/account-maintenance"],
+      ["How Do I Fund my Account?", "/faq/funding-an-account"], ["How do I Send Payments to Kitco?", "/faq/bank-wire-payment-instructions"],
+      ["How to Buy Bullion", "/faq/how-to-buy-from-kitco"], ["How to Sell Bullion", "/faq/how-to-sell-to-kitco"],
+      ["How to Sell Scrap", "/faq/how-to-sell-scrap-metal"], ["Payments and Fees", "/faq/payments-and-fees"],
+      ["Shipping and Insurance", "/faq/shipping-and-insurance"], ["Cancellations", "/faq/cancellations"],
+      ["Bullion Bars & Coins", "/faq/product-information"], ["Kitco Pool - Metal Accounts", "/faq/kitco-pool-accounts"],
+      ["Kitco Allocated Storage", "/faq/kitco-allocated-storage"], ["Precious Metals IRA", "/faq/precious-metals-ira"],
+      ["VaultChain™ Gold & Silver", "/faq/vaultchain"], ["Bullion Terminology", "/bullion-terminology/"]] },
+    { h: "Kitco News", href: "https://www.kitco.com/" },
+    { h: "Subscribe", href: "/subscribe" },
+  ];
+  const SUBMENU = {
+    gold: { title: "Buy from Kitco / Gold", href: "/gold", groups: [
+      { h: "Gold Coins", href: "/gold-coins", items: [["All Gold Coins", "/gold-coins"], ["American Gold Eagles", "/american-gold-eagle-coins"],
+        ["American Gold Buffalos", "/american-gold-buffalo-coins"], ["Canadian Gold Maples", "/canadian-gold-maple-leaf-coins"],
+        ["South African Gold Krugerrands", "/south-african-gold-krugerrand-coins"], ["Australian Gold Kangaroos", "/australian-gold-kangaroos-coins"]] },
+      { h: "Gold Bars", href: "/gold-bars" }] },
+    silver: { title: "Buy from Kitco / Silver", href: "/silver", groups: [
+      { h: "Silver Coins", href: "/silver-coins", items: [["All Silver Coins", "/silver-coins"], ["American Silver Eagles", "/american-silver-eagle-coins"],
+        ["American Silver Buffalos", "/american-silver-buffalo-coins"], ["Canadian Silver Maple Leafs", "/canadian-silver-maple-leaf-coins"]] },
+      { h: "Silver Rounds", href: "/silver-rounds" }, { h: "Silver Bars", href: "/silver-bars?v=201811031" }] },
+    platinum: { title: "Buy from Kitco / Platinum", href: "/platinum", groups: [
+      { h: "Platinum Coins", href: "/platinum-coins" }, { h: "Platinum Bars", href: "/platinum-bars" }] },
+    mints: { title: "Buy from Kitco / Bullion Mints", href: "/bullion-mints", groups: [{ items: [
+      ["U.S. Mint", "/united-states-mint"], ["Royal Canadian Mint", "/royal-canadian-mint"], ["British Royal Mint", "/british-royal-mint"],
+      ["South African Mint", "/south-african-mint"], ["New Zealand Mint", "/new-zealand-mint"], ["Perth Mint", "/australia-perth-mint"],
+      ["Austrian Mint", "/austrian-mint"]] }] },
+  };
+  const kUrl = href => /^https?:/.test(href) ? href : KITCO + href;
+  const kLink = ([label, href, cls]) => href.startsWith("#")
+    ? `<li><button type="button" data-km="sub" data-v="${href.slice(1)}">${label}</button></li>`
+    : `<li><a href="${kUrl(href)}"${cls ? ` class="${cls}"` : ""}>${label}</a></li>`;
+  const kmenu = document.getElementById("kmenu");
+  function renderMenu() {
+    const t = T();
+    kmenu.innerHTML = `
+      <div class="km-backdrop" data-km="close"></div>
+      <nav class="km-panel">
+        <div class="km-head">
+          <div>${t.hello} <a href="${KITCO}/signin.html">${t.logIn}</a> ${t.or} <a href="${KITCO}/create-account.html">${t.createAccount}</a></div>
+          <button class="km-close" data-km="close" aria-label="${t.closeMenu}"><svg width="16" height="16" viewBox="0 0 16 16" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 2l12 12M14 2 2 14"/></svg></button>
+        </div>
+        <div class="km-pages">
+          <div class="km-page km-main">
+            ${MENU.map((m, i) => `${i ? "<hr>" : ""}<a class="km-h" href="${kUrl(m.href)}">${m.h}</a>${m.items ? `<ul>${m.items.map(kLink).join("")}</ul>` : ""}`).join("")}
+          </div>
+          <div class="km-page km-sub" aria-hidden="true"></div>
+        </div>
+      </nav>`;
+  }
+  function openSub(key) {
+    const m = SUBMENU[key], sub = kmenu.querySelector(".km-sub");
+    sub.innerHTML = `
+      <div class="km-back"><button type="button" data-km="back"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 1.5 2 7l5.5 5.5"/></svg>${T().back}</button></div>
+      <a class="km-h" href="${kUrl(m.href)}">${m.title}</a>
+      ${m.groups.map(g => `${g.h ? `<a class="km-group" href="${kUrl(g.href)}">${g.h}</a>` : ""}${g.items ? `<ul>${g.items.map(kLink).join("")}</ul>` : ""}`).join("")}`;
+    sub.removeAttribute("aria-hidden");
+    sub.scrollTop = 0;
+    kmenu.classList.add("sub");
+  }
+  let menuOpener = null;
+  function openMenu() {
+    menuOpener = document.activeElement;
+    renderMenu();
+    kmenu.classList.remove("sub");
+    requestAnimationFrame(() => { kmenu.classList.add("open"); kmenu.querySelector(".km-close").focus(); });
+  }
+  function closeMenu() {
+    kmenu.classList.remove("open");
+    menuOpener?.focus?.();
+  }
+  kmenu.addEventListener("click", e => {
+    const el = e.target.closest("[data-km]");
+    if (!el) return;
+    if (el.dataset.km === "close") closeMenu();
+    else if (el.dataset.km === "sub") openSub(el.dataset.v);
+    else if (el.dataset.km === "back") kmenu.classList.remove("sub");
+  });
+  addEventListener("keydown", e => { if (e.key === "Escape" && kmenu.classList.contains("open")) closeMenu(); });
 
   /* ---------- screens ---------- */
   function step1() {
@@ -989,6 +1136,7 @@
     if (!el || el.disabled) return;
     const v = el.dataset.v;
     switch (el.dataset.act) {
+      case "menu": openMenu(); break;
       case "intent": state[v] = !state[v]; render(false); break;
       case "lang":
         if (v !== lang) { lang = v; try { localStorage.setItem("lang", v); } catch (e) {} render(false); }
