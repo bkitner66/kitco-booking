@@ -227,7 +227,7 @@
   @media (max-width: 599px) { html:not(.shot) .hero-title .for-phone { display: inline; } }
 
   /* layout wrappers only matter on larger screens */
-  .cols, .col { display: contents; }
+  .cols, .col, .s3-head, .s3-left { display: contents; }
 
   /* ---------- Tablet & desktop (600px and up): a page with the Kitco bar and a centred card ---------- */
   @media (min-width: 600px) {
@@ -272,7 +272,10 @@
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
     html:not(.shot) .s2 .cols { margin-top: 20px; }
     html:not(.shot) .s2 .col h2.section { margin-top: 0; }
-    html:not(.shot) .s3 .cols { margin-top: 6px; }
+    html:not(.shot) .s3 .cols { margin-top: 22px; align-items: center; }
+    html:not(.shot) .s3-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; }
+    html:not(.shot) .s3-left { display: block; }
+    html:not(.shot) .s3-head h1.title { margin: 0; align-self: start; font-size: 38px; line-height: 44px; }
     html:not(.shot) .s3 .summary { margin-top: 0; }
     html:not(.shot) main.s3 .btn.s3 { margin-top: 10px; }
     html:not(.shot) .btn.s1, html:not(.shot) .btn.s2 { width: 260px; align-self: flex-end; }
@@ -532,7 +535,8 @@
   .shot .done .ring, .shot .done .wipe { animation: none; }
   @keyframes wipe { from { transform: scaleX(0); } }
   .done h1 { font-size: 42px; line-height: 46px; font-weight: 700; letter-spacing: -.035em; margin: 20px 0 14px; color: #0d1a4f; }
-  .done p { font-size: 17.5px; line-height: 25px; color: var(--text); margin: 0 0 26px; padding: 0 4px; }
+  .done p { font-size: 17.5px; line-height: 25px; color: var(--text); margin: 0 0 12px; padding: 0 4px; }
+  .done p:last-of-type { margin-bottom: 26px; }
   @keyframes pop { from { transform: scale(.5); opacity: 0; } }
 </style>
 </head>
@@ -568,7 +572,7 @@
       days: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
       dow: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       docTitle: "Book an Appointment",
-      heroTitle: "Book An Appointment At Our Montreal Counter",
+      heroTitle: "Book an Appointment at our Montreal Counter",
       heroSub: "We look forward to your visit at 620 Cathcart St., 9th Floor.",
       heroMobile: "Book an Appointment at 620&nbsp;Cathcart, 9th&nbsp;Floor, Montreal",
       language: "Language", menu: "Menu",
@@ -596,7 +600,7 @@
       promos: "Send me promotions and helpful information.",
       call: 'Over $100,000? Call <a href="tel:18669712677">1 866 971-2677</a> before booking.',
       confirm: "Confirm Booking",
-      success: "Success!", thanks: "Thanks, your appointment is booked! We’ve sent a confirmation email with all of the information you’ll need. See you soon!",
+      success: "Success!", thanks: ["You’re all set! We’ve emailed you a confirmation with everything you need to know for your appointment.", "If you need to change your plans, use the links in the email to reschedule or cancel. See you soon!"],
       close: "Close",
       eName: "Please enter your name.", eEmail: "Please enter a valid email address.", eValue: "Please enter an estimated value.",
       eAccount: "Please choose Yes or No.", eTerms: "Please accept the terms and conditions.",
@@ -634,7 +638,7 @@
       promos: "Envoyez-moi des promotions et des renseignements utiles.",
       call: 'Plus de 100 000 $? Appelez au <a href="tel:18669712677">1 866 971-2677</a> avant de réserver.',
       confirm: "Confirmer le rendez-vous",
-      success: "Confirmé!", thanks: "Merci, votre rendez-vous est réservé! Nous vous avons envoyé un courriel de confirmation avec tous les renseignements nécessaires. À bientôt!",
+      success: "Confirmé!", thanks: ["C’est confirmé! Nous vous avons envoyé par courriel une confirmation avec tout ce qu’il faut savoir pour votre rendez-vous.", "Si vos plans changent, utilisez les liens dans le courriel pour reporter ou annuler votre rendez-vous. À bientôt!"],
       close: "Fermer",
       eName: "Veuillez entrer votre nom.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez entrer une valeur estimée.",
       eAccount: "Veuillez choisir Oui ou Non.", eTerms: "Veuillez accepter les conditions générales.",
@@ -985,9 +989,12 @@
     return `
       ${topbar()}
       <main class="view s3">
+        <div class="s3-head"><div class="s3-left">
         ${progress(3)}
         ${backBtn("arrow2")}
+        </div>
         <h1 class="serif title">${t.prepare}</h1>
+        </div>
         <div class="cols"><div class="col">
         <form id="details" novalidate>
           <div class="field ${bad("name")}">
@@ -1059,7 +1066,7 @@
         <div class="done">
           ${successIcon()}
           <h1 class="serif">${t.success}</h1>
-          <p>${t.thanks}</p>
+          ${t.thanks.map(x => `<p>${x}</p>`).join("")}
           <button class="btn s4" data-act="close">${t.close}</button>
         </div>
       </main>`;
