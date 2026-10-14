@@ -233,7 +233,7 @@
   @media (max-width: 599px) { html:not(.shot) .hero-title .for-phone { display: inline; } }
 
   /* layout wrappers only matter on larger screens */
-  .cols, .col, .s3-head, .s3-left { display: contents; }
+  .cols, .col, .step-head, .step-left { display: contents; }
 
   /* ---------- Tablet & desktop (600px and up): a page with the Kitco bar and a centred card ---------- */
   @media (min-width: 600px) {
@@ -276,12 +276,23 @@
     html:not(.shot) .col { display: block; min-width: 0; }
     html:not(.shot) .s1 .cols { margin-top: 24px; }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
-    html:not(.shot) .s2 .cols { margin-top: 20px; }
+    html:not(.shot) .s2 .cols { margin-top: 24px; grid-template-columns: 1.3fr 1fr; }
+    html:not(.shot) .s2 .calendar { padding: 18px 6px 8px; }
+    html:not(.shot) .s2 .cal-head { padding: 0 8px 14px 20px; }
+    html:not(.shot) .s2 .cal-head h3 { font-size: 26px; line-height: 30px; }
+    html:not(.shot) .s2 .dow { font-size: 14px; padding-bottom: 12px; }
+    html:not(.shot) .s2 .day { height: 52px; font-size: 18px; }
+    html:not(.shot) .s2 .day .num { width: 40px; height: 34px; }
+    html:not(.shot) .s2 .day.on .num, html:not(.shot) .s2 .day:not(:disabled):not(.on):hover .num { height: 40px; margin: -3px 0; }
+    html:not(.shot) .s2 .day .dot { width: 5px; height: 5px; }
+    html:not(.shot) .s2 .day.on .dot { margin-top: 7px; }
+    html:not(.shot) .s2 .col h2.section { font-size: 28px; line-height: 32px; margin-bottom: 16px; }
+    html:not(.shot) .s2 .slot { height: 44px; font-size: 16px; }
     html:not(.shot) .s2 .col h2.section { margin-top: 0; }
     html:not(.shot) .s3 .cols { margin-top: 22px; align-items: center; }
-    html:not(.shot) .s3-head { display: grid; grid-template-columns: auto 1fr; column-gap: 54px; align-items: start; }
-    html:not(.shot) .s3-left { display: block; }
-    html:not(.shot) .s3-head h1.title { margin: 0; align-self: start; font-size: 38px; line-height: 44px; }
+    html:not(.shot) .step-head { display: grid; grid-template-columns: auto 1fr; column-gap: 54px; align-items: start; }
+    html:not(.shot) .step-left { display: block; }
+    html:not(.shot) .step-head h1.title { margin: 0; align-self: start; font-size: 38px; line-height: 44px; }
     html:not(.shot) .s3 .summary { margin-top: 0; }
     html:not(.shot) main.s3 .btn.s3 { margin-top: 10px; }
     html:not(.shot) .btn.s1, html:not(.shot) .btn.s2 { width: 260px; align-self: flex-end; }
@@ -962,9 +973,12 @@
     return `
       ${topbar()}
       <main class="view s2">
+        <div class="step-head"><div class="step-left">
         ${progress(2)}
         ${backBtn("arrow2")}
+        </div>
         <h1 class="serif title">${t.chooseDate}</h1>
+        </div>
         <div class="cols"><div class="col">
         <div class="calendar">
           <div class="cal-head">
@@ -995,7 +1009,7 @@
     return `
       ${topbar()}
       <main class="view s3">
-        <div class="s3-head"><div class="s3-left">
+        <div class="step-head"><div class="step-left">
         ${progress(3)}
         ${backBtn("arrow2")}
         </div>
