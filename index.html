@@ -120,6 +120,12 @@
     html:not(.shot) .site-head { display: block; }
     html:not(.shot) main.s1 .page-title { display: none; }
     html:not(.shot) main.s1 .step-label { margin-top: 0; }
+    /* steps 2-4: only the thin Kitco bar, so the booking card can be larger; EN/FR moves into the bar */
+    html:not(.shot) .app:not(.has-topbar) .hero { display: none; }
+    html:not(.shot) .app:not(.has-topbar) .lang {
+      top: calc((clamp(38px, 2.9cqw, 68px) - clamp(32px, 2.55cqw, 53px) * .8) / 2);
+      transform: scale(.8); transform-origin: right top;
+    }
   }
   .app { container-type: inline-size; }
   .site-bar { background: #1f2f3e; height: clamp(38px, 2.9cqw, 68px); display: flex; align-items: center; padding-left: clamp(18px, 1.76cqw, 38px); }
@@ -273,7 +279,7 @@
     html:not(.shot) .s2 .cols { margin-top: 20px; }
     html:not(.shot) .s2 .col h2.section { margin-top: 0; }
     html:not(.shot) .s3 .cols { margin-top: 22px; align-items: center; }
-    html:not(.shot) .s3-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; }
+    html:not(.shot) .s3-head { display: grid; grid-template-columns: auto 1fr; column-gap: 54px; align-items: start; }
     html:not(.shot) .s3-left { display: block; }
     html:not(.shot) .s3-head h1.title { margin: 0; align-self: start; font-size: 38px; line-height: 44px; }
     html:not(.shot) .s3 .summary { margin-top: 0; }
