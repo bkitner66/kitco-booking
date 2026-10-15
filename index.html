@@ -287,7 +287,9 @@
     html:not(.shot) .s2 .day .dot { width: 5px; height: 5px; }
     html:not(.shot) .s2 .day.on .dot { margin-top: 7px; }
     html:not(.shot) .s2 .col h2.section { font-size: 28px; line-height: 32px; margin-bottom: 16px; }
-    html:not(.shot) .s2 .slot { height: 44px; font-size: 16px; }
+    html:not(.shot) .s2 .slot { height: 44px; font-size: 15px; }
+    /* desktop: 4 times per row, up to 7 rows without scrolling */
+    html:not(.shot) .s2 .slots { grid-template-columns: repeat(4, 1fr); }
     html:not(.shot) .s2 .col h2.section { margin-top: 0; }
     html:not(.shot) .s3 .cols { margin-top: 22px; align-items: center; }
     html:not(.shot) .step-head { display: grid; grid-template-columns: auto 1fr; column-gap: 54px; align-items: start; }
