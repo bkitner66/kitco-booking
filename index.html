@@ -279,18 +279,22 @@
     /* Step 1: the card is as wide as the other steps; content stays 864px wide and centred. */
     html:not(.shot) main.s1 { padding-left: calc(28px / var(--dk, 1)); padding-right: calc(28px / var(--dk, 1)); }
     /* wider duration column so each description fits on two lines */
-    html:not(.shot) .s1 .cols { grid-template-columns: max-content 1fr; column-gap: calc(30px / var(--dk, 1)); }
+    html:not(.shot) .s1 .cols { grid-template-columns: max-content max-content; justify-content: space-between; column-gap: calc(30px / var(--dk, 1)); }
+    /* duration column = its heading plus a little room on each side; boxes no wider than that */
+    html:not(.shot) .s1 h2.section.second { padding: 0 calc(64px / var(--dk, 1)); }
+    html:not(.shot) .s1 .card.duration { contain: inline-size; grid-template-columns: calc(46px * 1.18 / var(--dk, 1)) 1fr; padding-right: calc(10px / var(--dk, 1)); }
+    html:not(.shot) .s1 .card.duration .dot-radio { margin-left: calc(14px * 1.18 / var(--dk, 1)); }
     html:not(.shot) .s1 h2.section { white-space: nowrap; }
     html:not(.shot) .s1 .card.intent { contain: inline-size; }   /* left column is as wide as its heading */
     /* Continue: identical to step 2's button (step 2 draws it at scale 1.18) */
     html:not(.shot) main.s1 .btn.s1 {
       width: calc(260px * 1.18 / var(--dk, 1)); height: calc(46px * 1.18 / var(--dk, 1)); border-radius: calc(6px * 1.18 / var(--dk, 1));
-      font-size: calc(18.5px * 1.18 / var(--dk, 1)); font-weight: 400; background: #0a7192; margin-top: calc(18px * 1.18 / var(--dk, 1));
+      font-size: var(--btnfs, calc(18.5px * 1.18 / var(--dk, 1))); font-weight: 400; background: #0a7192; margin-top: calc(18px * 1.18 / var(--dk, 1));
     }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { font-size: calc(44.8px / var(--dk, 1)); line-height: 1.15; margin: 0 0 12px; }
     html:not(.shot) .s1 .cols { margin-top: 8px; }
-    /* the French duration question is much longer: keep it on one line */
-    html:lang(fr):not(.shot) .s1 h2.section.second { font-size: 28px; white-space: nowrap; }
+    /* "How much time do you need?" centred over its boxes; the longer French question may wrap */
+    html:not(.shot) .s1 h2.section.second { text-align: center; white-space: normal; text-wrap: balance; }
     html:not(.shot) .s1 .card .name { font-size: calc(26px * 1.18 / var(--dk, 1)); line-height: 1.15; letter-spacing: -.03em; }
     html:not(.shot) .s1 .card.intent { height: auto; min-height: 70px; padding: 10px 14px 12px 0; }
     html:not(.shot) .s1 .card.duration { padding: 9px 14px 11px 0; }
@@ -381,7 +385,7 @@
   .card.intent > span:last-child { padding-top: 1px; }
 
   .tick {
-    width: 24px; height: 24px; flex: none; border: 2.5px solid var(--teal); border-radius: 5px;
+    width: 24px; height: 24px; flex: none; border: 3px solid var(--teal); border-radius: 5px;
     display: inline-flex; align-items: center; justify-content: center; background: #fff; transition: background .15s;
   }
   .tick svg { opacity: 0; }
@@ -389,7 +393,7 @@
   .card.on .tick svg { opacity: 1; }
 
   .dot-radio {
-    width: 22px; height: 22px; flex: none; border: 2.5px solid #056f8e; border-radius: 50%;
+    width: 22px; height: 22px; flex: none; border: 3px solid #056f8e; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center; margin: 3px 0 0 18px;
   }
   .dot-radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #056f8e; transform: scale(0); transition: transform .15s; }
@@ -507,7 +511,7 @@
   /* ---------- Colours sampled from the mockups ---------- */
   .serif { color: #000215; }
   .page-title { color: #000; }
-  .card .desc { color: #5f6d94; font-weight: 400; }
+  .card .desc { color: #7884a6; font-weight: 400; }
   .step-label { color: #3f4a68; }
   .dot-radio { border-color: #056f8e; }
   .tick { border-color: #056f8e; }
@@ -1206,6 +1210,9 @@
         }
       }
       app.style.width = "";
+      // Step 1's Continue text renders at the size step 2's does. Step 2 fills the window height, so its
+      // scale tracks the height (about 18.5px x 0.0261 per px of height), capped by its maximum width scale.
+      if (s1) main.style.setProperty("--btnfs", Math.min(18.5 * 1.5 * w / DESIGN_W, .0261 * avail) / (lo * z) + "px");
     } else {
       const need = measure();
       if (need <= avail) { scroller.style.overflowY = ""; return; }
